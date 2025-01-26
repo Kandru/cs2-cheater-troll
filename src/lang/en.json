@@ -1,0 +1,9 @@
+{
+    "core.hotreload": "{green}[CheaterTroll] {default}Hot-Reloaded!",
+    "core.unload": "[CheaterTroll] Unloaded CheaterTroll Plugin!",
+    "core.defaultconfig": "[CheaterTroll] Found no map-specific configuration for {mapName}, using default one!",
+    "core.noconfig": "[CheaterTroll] No map-specific configuration for {mapName} or default one found. Skipping!",
+    "core.foundconfig": "[CheaterTroll] Found {count} matching map-specific configurations for {mapName}!",
+    "core.disabled": "[CheaterTroll] {default}CheaterTroll is disabled!",
+    "core.debugprint": "[CheaterTroll]{red}[DEBUG] {default}{message}"
+}

@@ -1,0 +1,9 @@
+{
+    "core.hotreload": "[CheaterTroll] Neu geladen! Würfen ab nächster Runde!",
+    "core.unload": "[CheaterTroll] CheaterTroll Plugin entladen!",
+    "core.defaultconfig": "[CheaterTroll] Keine kartenspezifische Konfiguration für {mapName} gefunden, Standardkonfiguration wird verwendet!",
+    "core.noconfig": "[CheaterTroll] Keine kartenspezifische Konfiguration für {mapName} oder Standardkonfiguration gefunden. Überspringen!",
+    "core.foundconfig": "[CheaterTroll] {count} passende kartenspezifische Konfigurationen für {mapName} gefunden!",
+    "core.disabled": "[CheaterTroll] {default}CheaterTroll ist deaktiviert!",
+    "core.debugprint": "[CheaterTroll]{red}[DEBUG] {default}{message}"
+}
