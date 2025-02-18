@@ -1,13 +1,12 @@
-﻿using System.Text.Json;
+﻿using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Extensions;
 using System.Text.Json.Serialization;
-using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Config;
 
 namespace CheaterTroll
 {
     public class CheaterConfig
     {
-        [JsonPropertyName("health")] public int Health { get; set; } = 100;
+        [JsonPropertyName("invisible_enemies")] public bool InvisibleEnemies { get; set; } = false;
     }
 
     public class PluginConfig : BasePluginConfig
@@ -21,29 +20,29 @@ namespace CheaterTroll
 
     public partial class CheaterTroll : BasePlugin, IPluginConfig<PluginConfig>
     {
-        public PluginConfig Config { get; set; } = null!;
-        private string _configPath = "";
+        public required PluginConfig Config { get; set; }
 
-        private void LoadConfig()
+        private void ReloadConfigFromDisk()
         {
-            Config = ConfigManager.Load<PluginConfig>("CheaterTroll");
-            _configPath = Path.Combine(ModuleDirectory, $"../../configs/plugins/CheaterTroll/CheaterTroll.json");
+            try
+            {
+                // load config from disk
+                Config.Reload();
+                // save config to disk
+                Config.Update();
+            }
+            catch (Exception e)
+            {
+                string message = Localizer["core.error"].Value.Replace("{error}", e.Message);
+                // log error
+                Console.WriteLine(message);
+            }
         }
 
         public void OnConfigParsed(PluginConfig config)
         {
             Config = config;
-            Console.WriteLine("[CheaterTroll] Initialized map configuration!");
-        }
-
-        private void UpdateConfig()
-        {
-        }
-
-        private void SaveConfig()
-        {
-            var jsonString = JsonSerializer.Serialize(Config, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(_configPath, jsonString);
+            Console.WriteLine(Localizer["core.config"]);
         }
     }
 }

@@ -5,5 +5,8 @@
     "core.noconfig": "[CheaterTroll] Keine kartenspezifische Konfiguration für {mapName} oder Standardkonfiguration gefunden. Überspringen!",
     "core.foundconfig": "[CheaterTroll] {count} passende kartenspezifische Konfigurationen für {mapName} gefunden!",
     "core.disabled": "[CheaterTroll] {default}CheaterTroll ist deaktiviert!",
-    "core.debugprint": "[CheaterTroll]{red}[DEBUG] {default}{message}"
+    "core.debugprint": "[CheaterTroll]{red}[DEBUG] {default}{message}",
+    "core.ondetection": "[CheaterTroll]{red}DETEKTIERUNG: {default}{message}",
+    "command.noplayers": "[CheaterTroll] {default}keinen Spieler gefunden.",
+    "command.toomanyplayers": "[CheaterTroll] {default}Zu viele Spieler gefunden."
 }
