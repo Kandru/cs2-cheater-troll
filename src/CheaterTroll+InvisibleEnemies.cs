@@ -28,9 +28,9 @@ namespace CheaterTroll
                     || player.Pawn.Value == null
                     || player.PlayerPawn == null || !player.PlayerPawn.IsValid || player.PlayerPawn.Value == null
                     || (player.TeamNum != (int)CsTeam.Terrorist && player.TeamNum != (int)CsTeam.CounterTerrorist)
-                    || player.PlayerPawn.Value.LifeState != (byte)LifeState_t.LIFE_ALIVE) continue;
-                if (!_cheaters.ContainsKey(player)) continue;
-                if (!_cheaters[player].Contains("invisible_enemies")) continue;
+                    || player.PlayerPawn.Value.LifeState != (byte)LifeState_t.LIFE_ALIVE
+                    || !_cheaters.ContainsKey(player.NetworkIDString)
+                    || !_cheaters[player.NetworkIDString].InvisibleEnemies) continue;
                 // do not transmit enemies that are alive
                 foreach (CCSPlayerController entry in Utilities.GetPlayers())
                 {
@@ -42,6 +42,7 @@ namespace CheaterTroll
                         && entry.PlayerPawn.Value != null
                         && entry.PlayerPawn.Value.LifeState == (byte)LifeState_t.LIFE_ALIVE)
                     {
+                        // do not transmit ;)
                         info.TransmitEntities.Remove(entry);
                     }
                 }
