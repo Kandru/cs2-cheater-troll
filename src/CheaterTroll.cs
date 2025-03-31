@@ -1,4 +1,5 @@
-﻿using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core;
 
 namespace CheaterTroll
 {
@@ -15,10 +16,19 @@ namespace CheaterTroll
             // register listeners
             RegisterEventHandler<EventPlayerConnectFull>(OnPlayerConnect);
             RegisterEventHandler<EventPlayerDisconnect>(OnPlayerDisconnect);
-            InitializeInvisibleEnemies();
-            // print message if hot reload
+            // check for hot reload
             if (hotReload)
             {
+                // check if cheaters are on our server if hot-reloaded
+                foreach (CCSPlayerController entry in Utilities.GetPlayers().Where(p => p.IsValid && !p.IsBot && !p.IsHLTV))
+                {
+                    if (Config.Cheater.TryGetValue(entry.NetworkIDString, out CheaterConfig? cheaterConfig))
+                    {
+                        _cheaters.Add(entry.NetworkIDString, cheaterConfig);
+                    }
+                }
+                // initialize listeners
+                InitializeListener();
                 Console.WriteLine(Localizer["core.hotreload"]);
             }
         }
@@ -30,6 +40,18 @@ namespace CheaterTroll
             DeregisterEventHandler<EventPlayerDisconnect>(OnPlayerDisconnect);
             ResetInvisibleEnemies();
             Console.WriteLine(Localizer["core.unload"]);
+        }
+
+        private void InitializeListener()
+        {
+            bool enableInvisibleENemies = false;
+            // check if cheaters have certain features enabled
+            foreach (KeyValuePair<string, CheaterConfig> entry in _cheaters)
+            {
+                if (entry.Value.InvisibleEnemies) enableInvisibleENemies = true;
+            }
+            // enable invisible enemies
+            if (enableInvisibleENemies) InitializeInvisibleEnemies();
         }
 
         private HookResult OnPlayerConnect(EventPlayerConnectFull @event, GameEventInfo info)

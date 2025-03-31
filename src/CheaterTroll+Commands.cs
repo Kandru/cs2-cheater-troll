@@ -45,6 +45,8 @@ namespace CheaterTroll
                             InvisibleEnemies = true
                         }
                     );
+                    // initialize listeners
+                    InitializeListener();
                     command.ReplyToCommand(Localizer["command.addedplayer"].Value.Replace("{player}", availablePlayers[0].PlayerName));
                 }
                 else

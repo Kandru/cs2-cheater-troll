@@ -6,20 +6,29 @@ namespace CheaterTroll
 {
     public partial class CheaterTroll : BasePlugin, IPluginConfig<PluginConfig>
     {
+        private bool _InvisibleEnemiesEnabled = false;
+
         private void InitializeInvisibleEnemies()
         {
+            if (_InvisibleEnemiesEnabled) return;
             RegisterListener<Listeners.CheckTransmit>(EventInvisibleEnemiesCheckTransmit);
+            _InvisibleEnemiesEnabled = true;
         }
 
         private void ResetInvisibleEnemies()
         {
             RemoveListener<Listeners.CheckTransmit>(EventInvisibleEnemiesCheckTransmit);
+            _InvisibleEnemiesEnabled = false;
         }
 
         private void EventInvisibleEnemiesCheckTransmit(CCheckTransmitInfoList infoList)
         {
             // remove listener if no players to save resources
-            if (_cheaters.Count() == 0) return;
+            if (_cheaters.Count() == 0)
+            {
+                ResetInvisibleEnemies();
+                return;
+            }
             // worker
             foreach ((CCheckTransmitInfo info, CCSPlayerController? player) in infoList)
             {
