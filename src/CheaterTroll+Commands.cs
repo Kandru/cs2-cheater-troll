@@ -3,6 +3,7 @@ using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Attributes.Registration;
 using CounterStrikeSharp.API.Modules.Admin;
 using CounterStrikeSharp.API.Modules.Commands;
+using CounterStrikeSharp.API.Modules.Extensions;
 
 namespace CheaterTroll
 {
@@ -26,17 +27,36 @@ namespace CheaterTroll
             }
             else if (availablePlayers.Count == 1)
             {
-                if (!_cheaters.ContainsKey(availablePlayers[0]))
+                if (!_cheaters.ContainsKey(availablePlayers[0].NetworkIDString))
                 {
-                    // statically add invisible enemy punishment for now
-                    _cheaters.Add(availablePlayers[0], ["invisible_enemies"]);
+                    // add cheater to active cheater list
+                    _cheaters.Add(
+                        availablePlayers[0].NetworkIDString,
+                        new CheaterConfig
+                        {
+                            InvisibleEnemies = true
+                        }
+                    );
+                    // add cheater to cheaters in config if they do not already exist
+                    Config.Cheater.Add(
+                        availablePlayers[0].NetworkIDString,
+                        new CheaterConfig
+                        {
+                            InvisibleEnemies = true
+                        }
+                    );
                     command.ReplyToCommand(Localizer["command.addedplayer"].Value.Replace("{player}", availablePlayers[0].PlayerName));
                 }
                 else
                 {
-                    _cheaters.Remove(availablePlayers[0]);
+                    // remove cheater from active cheater list
+                    _cheaters.Remove(availablePlayers[0].NetworkIDString);
+                    // remove cheater from cheaters in config
+                    Config.Cheater.Remove(availablePlayers[0].NetworkIDString);
                     command.ReplyToCommand(Localizer["command.removedplayer"].Value.Replace("{player}", availablePlayers[0].PlayerName));
                 }
+                // update config
+                Config.Update();
             }
             else
             {

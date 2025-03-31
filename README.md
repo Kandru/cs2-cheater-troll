@@ -11,11 +11,10 @@ This plugin will make the life for cheaters harder by applying some server-side 
 
 ## Current Features against cheater
 
-- None yet
+- Player won't see enemies as long as he is alive (not transmitted by the server). Whenever he is not alive he will see everyone.
 
 ## Road Map
 
-- Make players invisible for the cheater (either all or randomly)
 - Make cheater glow for everyone else
 - Jam cheater weapons
 - Give cheater "butter fingers" (they drop weapons from time to time)
@@ -32,7 +31,7 @@ This plugin will make the life for cheaters harder by applying some server-side 
 ## Plugin Installation
 
 1. Download and extract the latest release from the [GitHub releases page](https://github.com/Kandru/cs2-cheater-troll/releases/).
-2. Move the "CheaterTroll" folder to the `/addons/counterstrikesharp/configs/plugins/` directory of your gameserver.
+2. Move the "CheaterTroll" folder to the `/addons/counterstrikesharp/plugins/` directory of your gameserver.
 3. Restart the server.
 
 ## Plugin Update
@@ -51,11 +50,10 @@ This plugin automatically creates a readable JSON configuration file. This confi
 {
   "enabled": true,
   "debug": false,
+  "cheater": {},
   "ConfigVersion": 1
 }
 ```
-
-You can either disable the complete CheaterTroll Plugin by simply setting the *enable* boolean to *false* or specify a specific map where you want this plugin to be disabled. This allows for a maximum customizability.
 
 ## Compile Yourself
 

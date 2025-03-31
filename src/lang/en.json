@@ -1,12 +1,9 @@
 {
     "core.hotreload": "{green}[CheaterTroll] {default}Hot-Reloaded!",
     "core.unload": "[CheaterTroll] Unloaded CheaterTroll Plugin!",
-    "core.defaultconfig": "[CheaterTroll] Found no map-specific configuration for {mapName}, using default one!",
-    "core.noconfig": "[CheaterTroll] No map-specific configuration for {mapName} or default one found. Skipping!",
-    "core.foundconfig": "[CheaterTroll] Found {count} matching map-specific configurations for {mapName}!",
-    "core.disabled": "[CheaterTroll] {default}CheaterTroll is disabled!",
     "core.debugprint": "[CheaterTroll]{red}[DEBUG] {default}{message}",
-    "core.ondetection": "[CheaterTroll]{red}DETECTION: {default}{message}",
     "command.noplayers": "[CheaterTroll] {default}no players found.",
-    "command.toomanyplayers": "[CheaterTroll] {default}Too many players found."
+    "command.toomanyplayers": "[CheaterTroll] {default}Too many players found.",
+    "command.addedplayer": "[CheaterTroll] {default}Added {green}{player}{default}.",
+    "command.removedplayer": "[CheaterTroll] {default}Removed {green}{player}{default}."
 }

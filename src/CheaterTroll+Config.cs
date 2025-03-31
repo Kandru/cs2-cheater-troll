@@ -22,26 +22,11 @@ namespace CheaterTroll
     {
         public required PluginConfig Config { get; set; }
 
-        private void ReloadConfigFromDisk()
-        {
-            try
-            {
-                // load config from disk
-                Config.Reload();
-                // save config to disk
-                Config.Update();
-            }
-            catch (Exception e)
-            {
-                string message = Localizer["core.error"].Value.Replace("{error}", e.Message);
-                // log error
-                Console.WriteLine(message);
-            }
-        }
-
         public void OnConfigParsed(PluginConfig config)
         {
             Config = config;
+            // update configuration with latest plugin changes
+            Config.Update();
             Console.WriteLine(Localizer["core.config"]);
         }
     }
