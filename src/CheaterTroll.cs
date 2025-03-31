@@ -64,6 +64,8 @@ namespace CheaterTroll
             _cheaters.Add(
                 player.NetworkIDString,
                 Config.Cheater[player.NetworkIDString]);
+            // initialize listener
+            InitializeListener();
             return HookResult.Continue;
         }
 

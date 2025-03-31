@@ -11,16 +11,18 @@ namespace CheaterTroll
     {
         [ConsoleCommand("cheater", "Set or unset player as a cheater")]
         [RequiresPermissions("@cheatertroll/admin")]
-        [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY, minArgs: 1, usage: "[player]")]
-        public void CommandGiveDice(CCSPlayerController player, CommandInfo command)
+        [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY, minArgs: 0, usage: "[player]")]
+        public void CommandAddCheater(CCSPlayerController player, CommandInfo command)
         {
             string playerName = command.GetArg(1);
             if (playerName == null || playerName == "") return;
             List<CCSPlayerController> availablePlayers = [];
-            foreach (CCSPlayerController entry in Utilities.GetPlayers())
-            {
-                if (entry.PlayerName.Contains(playerName, StringComparison.OrdinalIgnoreCase)) availablePlayers.Add(entry);
-            }
+            foreach (CCSPlayerController entry in Utilities.GetPlayers()
+                .Where(p => p.IsValid
+                    && !p.IsBot
+                    && !p.IsHLTV
+                    && p.PlayerName.ToLower().Contains(playerName.ToLower())))
+                availablePlayers.Add(entry);
             if (availablePlayers.Count == 0)
             {
                 command.ReplyToCommand(Localizer["command.noplayers"]);
