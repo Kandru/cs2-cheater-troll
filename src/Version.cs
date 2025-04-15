@@ -4,6 +4,6 @@ namespace CheaterTroll
 {
     public partial class CheaterTroll : BasePlugin
     {
-        public override string ModuleVersion => "0.0.5";
+        public override string ModuleVersion => "0.0.6";
     }
 }
