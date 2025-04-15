@@ -11,7 +11,7 @@ namespace CheaterTroll
     {
         [ConsoleCommand("cheater", "Set or unset player as a cheater")]
         [RequiresPermissions("@cheatertroll/admin")]
-        [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY, minArgs: 0, usage: "[player]")]
+        [CommandHelper(whoCanExecute: CommandUsage.CLIENT_AND_SERVER, minArgs: 0, usage: "[player]")]
         public void CommandAddCheater(CCSPlayerController player, CommandInfo command)
         {
             string playerName = command.GetArg(1);
