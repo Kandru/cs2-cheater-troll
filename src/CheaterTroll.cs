@@ -59,6 +59,7 @@ namespace CheaterTroll
             CCSPlayerController? player = @event.Userid;
             if (player == null
                 || !player.IsValid
+                || string.IsNullOrEmpty(player.NetworkIDString)
                 || !Config.Cheater.ContainsKey(player.NetworkIDString)) return HookResult.Continue;
             // add cheater to active cheaters if in config
             _cheaters.Add(
