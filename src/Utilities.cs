@@ -1,4 +1,5 @@
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Utils;
 
 namespace CheaterTroll
 {
@@ -10,6 +11,14 @@ namespace CheaterTroll
             {
                 Console.WriteLine(Localizer["core.debugprint"].Value.Replace("{message}", message));
             }
+        }
+
+        private static float GetVectorDistance(Vector a, Vector b)
+        {
+            float dx = a.X - b.X;
+            float dy = a.Y - b.Y;
+            float dz = a.Z - b.Z;
+            return MathF.Sqrt(dx * dx + dy * dy + dz * dz);
         }
     }
 }

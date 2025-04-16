@@ -110,7 +110,7 @@ namespace CheaterTroll
                                 && _InvisibleEnemiesModeRandom[player.NetworkIDString].Contains(entry)
                             // mode "Distance"
                             || _onlineCheaters[player.NetworkIDString].InvisibleEnemies.Mode == InvisibleEnemiesMode.Distance
-                                && GetDistance(player.PlayerPawn.Value.AbsOrigin, entry.PlayerPawn.Value.AbsOrigin) < Config.InvisibleEnemies.Distance
+                                && GetVectorDistance(player.PlayerPawn.Value.AbsOrigin, entry.PlayerPawn.Value.AbsOrigin) < Config.InvisibleEnemies.Distance
                         ))
                     {
                         // do not transmit ;)
@@ -118,14 +118,6 @@ namespace CheaterTroll
                     }
                 }
             }
-        }
-
-        private static float GetDistance(Vector a, Vector b)
-        {
-            float dx = a.X - b.X;
-            float dy = a.Y - b.Y;
-            float dz = a.Z - b.Z;
-            return MathF.Sqrt(dx * dx + dy * dy + dz * dz);
         }
     }
 }
