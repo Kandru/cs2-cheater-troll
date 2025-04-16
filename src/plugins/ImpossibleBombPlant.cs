@@ -7,7 +7,7 @@ namespace CheaterTroll
     public partial class CheaterTroll : BasePlugin, IPluginConfig<PluginConfig>
     {
         private bool _ImpossibleBombPlantEnabled = false;
-        private bool _ImpossibleBombPlantAborted = false;
+        private float _ImpossibleBombPlantLastPlant = 0;
 
         private void InitializeImpossibleBombPlant()
         {
@@ -28,7 +28,7 @@ namespace CheaterTroll
             DeregisterEventHandler<EventBombAbortplant>(OnBombAbortplant);
             // disable plug-in
             _ImpossibleBombPlantEnabled = false;
-            _ImpossibleBombPlantAborted = false;
+            _ImpossibleBombPlantLastPlant = 0;
             DebugPrint("Plugin ImpossibleBombPlant disabled");
         }
 
@@ -56,13 +56,14 @@ namespace CheaterTroll
                 {
                     if (@event.Site == bombSite.Index)
                     {
-                        _ImpossibleBombPlantAborted = false;
+                        _ImpossibleBombPlantLastPlant = Server.CurrentTime;
+                        float currentServerTime = Server.CurrentTime;
                         // stop bomb plant
                         AddTimer(3.01f, () =>
                         {
                             if (bombSite == null
                                 || !bombSite.IsValid
-                                || _ImpossibleBombPlantAborted) return;
+                                || _ImpossibleBombPlantLastPlant != currentServerTime) return;
                             // change player weapon to knife to create the illusion of a bomb plant
                             player.ExecuteClientCommand("slot3");
                             // send player a nice message
@@ -115,7 +116,7 @@ namespace CheaterTroll
 
         private HookResult OnBombAbortplant(EventBombAbortplant @event, GameEventInfo info)
         {
-            _ImpossibleBombPlantAborted = true;
+            _ImpossibleBombPlantLastPlant = 0;
             return HookResult.Continue;
         }
     }
