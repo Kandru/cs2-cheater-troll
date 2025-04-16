@@ -1,3 +1,4 @@
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 
@@ -19,6 +20,11 @@ namespace CheaterTroll
             float dy = a.Y - b.Y;
             float dz = a.Z - b.Z;
             return MathF.Sqrt(dx * dx + dy * dy + dz * dz);
+        }
+
+        private CCSGameRules? GetGameRules()
+        {
+            return Utilities.FindAllEntitiesByDesignerName<CCSGameRulesProxy>("cs_gamerules").First().GameRules;
         }
     }
 }

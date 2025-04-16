@@ -41,6 +41,7 @@ namespace CheaterTroll
             ResetInvisibleEnemies();
             ResetGrenadeSelfDamage();
             ResetImpossibleBombPlant();
+            ResetRandomPlayerSounds();
             Console.WriteLine(Localizer["core.unload"]);
         }
 
@@ -49,12 +50,14 @@ namespace CheaterTroll
             bool enableInvisibleEnemies = false;
             bool enableGrenadeSelfDamage = false;
             bool enableImpossibleBombPlant = false;
+            bool enableRandomPlayerSounds = false;
             // check if cheaters have certain features enabled
             foreach (KeyValuePair<string, CheaterConfig> entry in _onlineCheaters)
             {
                 if (entry.Value.InvisibleEnemies.Enabled) enableInvisibleEnemies = true;
                 if (entry.Value.GrenadeSelfDamage.Enabled) enableGrenadeSelfDamage = true;
                 if (entry.Value.ImpossibleBombPlant.Enabled) enableImpossibleBombPlant = true;
+                if (entry.Value.RandomPlayerSounds.Enabled) enableRandomPlayerSounds = true;
             }
             // enable invisible enemies
             if (enableInvisibleEnemies) InitializeInvisibleEnemies();
@@ -62,6 +65,8 @@ namespace CheaterTroll
             if (enableGrenadeSelfDamage) InitializeGrenadeSelfDamage();
             // enable impossible bomb plant
             if (enableImpossibleBombPlant) InitializeImpossibleBombPlant();
+            // enable random player sounds
+            if (enableRandomPlayerSounds) InitializeRandomPlayerSounds();
         }
 
         private HookResult OnPlayerConnect(EventPlayerConnectFull @event, GameEventInfo info)
