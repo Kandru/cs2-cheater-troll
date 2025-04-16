@@ -4,6 +4,8 @@ namespace CheaterTroll
 {
     public class GrenadeSelfDamageConfig
     {
+        // enabled
+        [JsonPropertyName("enabled")] public bool Enabled { get; set; } = true;
         // enabled for he grenades
         [JsonPropertyName("enable_hegrenades")] public bool EnableHEGrenades { get; set; } = true;
         // enabled for molotovs

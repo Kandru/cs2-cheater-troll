@@ -12,6 +12,7 @@ namespace CheaterTroll
 
         private void InitializeInvisibleEnemies()
         {
+            if (!Config.InvisibleEnemies.Enabled) return;
             // check type of InvisibleEnemies for each player and initialize accordingly
             foreach (KeyValuePair<string, CheaterConfig> entry in _onlineCheaters)
             {

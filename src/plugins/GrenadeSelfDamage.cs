@@ -10,6 +10,7 @@ namespace CheaterTroll
 
         private void InitializeGrenadeSelfDamage()
         {
+            if (!Config.GrenadeSelfDamage.Enabled) return;
             // skip if already enabled
             if (_GrenadeSelfDamageEnabled) return;
             // register listener

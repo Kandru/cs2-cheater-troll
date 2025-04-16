@@ -4,6 +4,8 @@ namespace CheaterTroll
 {
     public class InvisibleEnemiesConfig
     {
+        // enabled
+        [JsonPropertyName("enabled")] public bool Enabled { get; set; } = true;
         [JsonIgnore] public InvisibleEnemiesMode DefaultMode { get; set; } = InvisibleEnemiesMode.Full;
         [JsonPropertyName("mode")]
         public string DefaultModeString

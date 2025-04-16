@@ -11,6 +11,7 @@ namespace CheaterTroll
 
         private void InitializeImpossibleBombPlant()
         {
+            if (!Config.ImpossibleBombPlant.Enabled) return;
             // skip if already enabled
             if (_ImpossibleBombPlantEnabled) return;
             // register listener

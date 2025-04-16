@@ -12,6 +12,7 @@ namespace CheaterTroll
 
         private void InitializeRandomPlayerSounds()
         {
+            if (!Config.RandomPlayerSounds.Enabled) return;
             // skip if already enabled
             if (_RandomPlayerSoundsEnabled) return;
             // register listener

@@ -4,6 +4,8 @@ namespace CheaterTroll
 {
     public class ImpossibleBombPlantConfig
     {
+        // enabled
+        [JsonPropertyName("enabled")] public bool Enabled { get; set; } = true;
     }
 
 

@@ -10,6 +10,7 @@ namespace CheaterTroll
 
         private void InitializeAlwaysDoorClosed()
         {
+            if (!Config.AlwaysDoorClosed.Enabled) return;
             // skip if already enabled
             if (_AlwaysDoorClosedEnabled) return;
             // register listener
@@ -30,6 +31,7 @@ namespace CheaterTroll
 
         private HookResult OnDoorOpen(EventDoorOpen @event, GameEventInfo info)
         {
+            if (!Config.AlwaysDoorClosed.Enabled) return HookResult.Continue;
             DebugPrint("OnDoorOpen");
             long doorIndex = @event.Entindex;
             // if there is already one action on this door, skip

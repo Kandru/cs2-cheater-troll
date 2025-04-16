@@ -4,6 +4,8 @@ namespace CheaterTroll
 {
     public class AlwaysDoorClosedConfig
     {
+        // enabled
+        [JsonPropertyName("enabled")] public bool Enabled { get; set; } = true;
         // sound to play on door close
         [JsonPropertyName("sound")] public string Sound { get; set; } = "Saysound.Knock";
         // speed of door open

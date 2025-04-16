@@ -4,6 +4,8 @@ namespace CheaterTroll
 {
     public class RandomPlayerSoundsConfig
     {
+        // enabled
+        [JsonPropertyName("enabled")] public bool Enabled { get; set; } = true;
         // random sound list with their parameters
         [JsonPropertyName("sounds")]
         public List<RandomPlayerSoundConfig> Sounds { get; set; } = [
