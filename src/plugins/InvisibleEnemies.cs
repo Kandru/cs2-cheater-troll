@@ -22,6 +22,7 @@ namespace CheaterTroll
             // register listener
             RegisterListener<Listeners.CheckTransmit>(EventInvisibleEnemiesCheckTransmit);
             _InvisibleEnemiesEnabled = true;
+            DebugPrint("Plugin InvisibleEnemies enabled");
         }
 
         private void ResetInvisibleEnemies()
@@ -32,6 +33,7 @@ namespace CheaterTroll
             _InvisibleEnemiesEnabled = false;
             _InvisibleEnemiesModeRandom.Clear();
             _InvisibleEnemiesModeRandomNextChange = 0;
+            DebugPrint("Plugin InvisibleEnemies disabled");
         }
 
         private void EventInvisibleEnemiesCheckTransmit(CCheckTransmitInfoList infoList)

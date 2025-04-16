@@ -15,7 +15,7 @@ namespace CheaterTroll
             // register listener
             RegisterEventHandler<EventBombBeginplant>(OnBombBeginplant, HookMode.Pre);
             _ImpossibleBombPlantEnabled = true;
-            DebugPrint("Plugin GrenadeSelfDamage enabled");
+            DebugPrint("Plugin ImpossibleBombPlant enabled");
         }
 
         private void ResetImpossibleBombPlant()
@@ -24,7 +24,7 @@ namespace CheaterTroll
             DeregisterEventHandler<EventBombBeginplant>(OnBombBeginplant, HookMode.Pre);
             // disable plug-in
             _ImpossibleBombPlantEnabled = false;
-            DebugPrint("Plugin GrenadeSelfDamage disabled");
+            DebugPrint("Plugin ImpossibleBombPlant disabled");
         }
 
         private HookResult OnBombBeginplant(EventBombBeginplant @event, GameEventInfo info)
