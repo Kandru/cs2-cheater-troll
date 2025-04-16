@@ -65,6 +65,13 @@ namespace CheaterTroll
                                 || _ImpossibleBombPlantAborted) return;
                             // change player weapon to knife to create the illusion of a bomb plant
                             player.ExecuteClientCommand("slot3");
+                            // send player a nice message
+                            Server.NextFrame(() =>
+                            {
+                                if (player == null
+                                    || !player.IsValid) return;
+                                player.PrintToCenterHtml("BOMB PLANTED");
+                            });
                             // play bomb plant sound
                             RecipientFilter filter = [player];
                             player.EmitSound("Announcer.BombPlanted.CS2_Classic", filter);
