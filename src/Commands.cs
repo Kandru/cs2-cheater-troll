@@ -29,10 +29,10 @@ namespace CheaterTroll
             }
             else if (availablePlayers.Count == 1)
             {
-                if (!_cheaters.ContainsKey(availablePlayers[0].NetworkIDString))
+                if (!_onlineCheaters.ContainsKey(availablePlayers[0].NetworkIDString))
                 {
                     // add cheater to active cheater list
-                    _cheaters.Add(
+                    _onlineCheaters.Add(
                         availablePlayers[0].NetworkIDString,
                         new CheaterConfig
                         {
@@ -54,7 +54,7 @@ namespace CheaterTroll
                 else
                 {
                     // remove cheater from active cheater list
-                    _cheaters.Remove(availablePlayers[0].NetworkIDString);
+                    _onlineCheaters.Remove(availablePlayers[0].NetworkIDString);
                     // remove cheater from cheaters in config
                     Config.Cheater.Remove(availablePlayers[0].NetworkIDString);
                     command.ReplyToCommand(Localizer["command.removedplayer"].Value.Replace("{player}", availablePlayers[0].PlayerName));

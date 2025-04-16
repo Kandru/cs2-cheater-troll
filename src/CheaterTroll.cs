@@ -8,8 +8,7 @@ namespace CheaterTroll
         public override string ModuleName => "Cheater Troll";
         public override string ModuleAuthor => "Kalle <kalle@kandru.de>";
 
-        private Dictionary<string, CheaterConfig> _cheaters = new();
-        Random _random = new Random(Guid.NewGuid().GetHashCode());
+        private Dictionary<string, CheaterConfig> _onlineCheaters = [];
 
         public override void Load(bool hotReload)
         {
@@ -24,10 +23,10 @@ namespace CheaterTroll
                 {
                     if (Config.Cheater.TryGetValue(entry.NetworkIDString, out CheaterConfig? cheaterConfig))
                     {
-                        _cheaters.Add(entry.NetworkIDString, cheaterConfig);
+                        _onlineCheaters.Add(entry.NetworkIDString, cheaterConfig);
                     }
                 }
-                // initialize listeners
+                // initialize listeners if cheaters are online
                 InitializeListener();
                 Console.WriteLine(Localizer["core.hotreload"]);
             }
@@ -38,20 +37,21 @@ namespace CheaterTroll
             // unregister listeners
             DeregisterEventHandler<EventPlayerConnectFull>(OnPlayerConnect);
             DeregisterEventHandler<EventPlayerDisconnect>(OnPlayerDisconnect);
+            // reset plug-ins
             ResetInvisibleEnemies();
             Console.WriteLine(Localizer["core.unload"]);
         }
 
         private void InitializeListener()
         {
-            bool enableInvisibleENemies = false;
+            bool enableInvisibleEnemies = false;
             // check if cheaters have certain features enabled
-            foreach (KeyValuePair<string, CheaterConfig> entry in _cheaters)
+            foreach (KeyValuePair<string, CheaterConfig> entry in _onlineCheaters)
             {
-                if (entry.Value.InvisibleEnemies) enableInvisibleENemies = true;
+                if (entry.Value.InvisibleEnemies) enableInvisibleEnemies = true;
             }
             // enable invisible enemies
-            if (enableInvisibleENemies) InitializeInvisibleEnemies();
+            if (enableInvisibleEnemies) InitializeInvisibleEnemies();
         }
 
         private HookResult OnPlayerConnect(EventPlayerConnectFull @event, GameEventInfo info)
@@ -62,7 +62,7 @@ namespace CheaterTroll
                 || string.IsNullOrEmpty(player.NetworkIDString)
                 || !Config.Cheater.ContainsKey(player.NetworkIDString)) return HookResult.Continue;
             // add cheater to active cheaters if in config
-            _cheaters.Add(
+            _onlineCheaters.Add(
                 player.NetworkIDString,
                 Config.Cheater[player.NetworkIDString]);
             // initialize listener
@@ -76,9 +76,9 @@ namespace CheaterTroll
             if (player == null
                 || !player.IsValid
                 || string.IsNullOrEmpty(player.NetworkIDString)
-                || !_cheaters.ContainsKey(player.NetworkIDString)) return HookResult.Continue;
+                || !_onlineCheaters.ContainsKey(player.NetworkIDString)) return HookResult.Continue;
             // remove cheater from active cheaters (but keep in config)
-            _cheaters.Remove(player.NetworkIDString);
+            _onlineCheaters.Remove(player.NetworkIDString);
             return HookResult.Continue;
         }
     }

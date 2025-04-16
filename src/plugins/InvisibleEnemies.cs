@@ -10,21 +10,25 @@ namespace CheaterTroll
 
         private void InitializeInvisibleEnemies()
         {
+            // skip if already enabled
             if (_InvisibleEnemiesEnabled) return;
+            // register listener
             RegisterListener<Listeners.CheckTransmit>(EventInvisibleEnemiesCheckTransmit);
             _InvisibleEnemiesEnabled = true;
         }
 
         private void ResetInvisibleEnemies()
         {
+            // remove listener
             RemoveListener<Listeners.CheckTransmit>(EventInvisibleEnemiesCheckTransmit);
+            // disable plug-in
             _InvisibleEnemiesEnabled = false;
         }
 
         private void EventInvisibleEnemiesCheckTransmit(CCheckTransmitInfoList infoList)
         {
             // remove listener if no players to save resources
-            if (_cheaters.Count() == 0)
+            if (_onlineCheaters.Count() == 0)
             {
                 ResetInvisibleEnemies();
                 return;
@@ -38,8 +42,8 @@ namespace CheaterTroll
                     || player.PlayerPawn == null || !player.PlayerPawn.IsValid || player.PlayerPawn.Value == null
                     || (player.TeamNum != (int)CsTeam.Terrorist && player.TeamNum != (int)CsTeam.CounterTerrorist)
                     || player.PlayerPawn.Value.LifeState != (byte)LifeState_t.LIFE_ALIVE
-                    || !_cheaters.ContainsKey(player.NetworkIDString)
-                    || !_cheaters[player.NetworkIDString].InvisibleEnemies) continue;
+                    || !_onlineCheaters.ContainsKey(player.NetworkIDString)
+                    || !_onlineCheaters[player.NetworkIDString].InvisibleEnemies) continue;
                 // do not transmit enemies that are alive
                 foreach (CCSPlayerController entry in Utilities.GetPlayers())
                 {
