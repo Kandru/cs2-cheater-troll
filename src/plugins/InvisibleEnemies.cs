@@ -60,6 +60,7 @@ namespace CheaterTroll
             {
                 // check if player is in config and has InvisibleEnemies enabled
                 if (player == null
+                    || !player.IsValid
                     || string.IsNullOrEmpty(player.NetworkIDString)
                     || !_onlineCheaters.ContainsKey(player.NetworkIDString)
                     || !_onlineCheaters[player.NetworkIDString].InvisibleEnemies.Enabled
