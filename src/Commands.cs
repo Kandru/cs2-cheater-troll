@@ -35,7 +35,8 @@ namespace CheaterTroll
                     {
                         InvisibleEnemies = new InvisibleEnemiesPlayerConfig
                         {
-                            Enabled = true
+                            Enabled = true,
+                            Mode = InvisibleEnemiesMode.Distance
                         }
                     };
                     // add cheater to active cheater list
