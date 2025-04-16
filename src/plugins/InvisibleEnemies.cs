@@ -37,13 +37,14 @@ namespace CheaterTroll
             foreach ((CCheckTransmitInfo info, CCSPlayerController? player) in infoList)
             {
                 if (player == null
+                    || string.IsNullOrEmpty(player.NetworkIDString)
+                    || !_onlineCheaters.ContainsKey(player.NetworkIDString)
+                    || !_onlineCheaters[player.NetworkIDString].InvisibleEnemies.Enabled
                     || player.Pawn == null
                     || player.Pawn.Value == null
                     || player.PlayerPawn == null || !player.PlayerPawn.IsValid || player.PlayerPawn.Value == null
                     || (player.TeamNum != (int)CsTeam.Terrorist && player.TeamNum != (int)CsTeam.CounterTerrorist)
-                    || player.PlayerPawn.Value.LifeState != (byte)LifeState_t.LIFE_ALIVE
-                    || !_onlineCheaters.ContainsKey(player.NetworkIDString)
-                    || !_onlineCheaters[player.NetworkIDString].InvisibleEnemies) continue;
+                    || player.PlayerPawn.Value.LifeState != (byte)LifeState_t.LIFE_ALIVE) continue;
                 // do not transmit enemies that are alive
                 foreach (CCSPlayerController entry in Utilities.GetPlayers())
                 {

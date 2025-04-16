@@ -48,7 +48,7 @@ namespace CheaterTroll
             // check if cheaters have certain features enabled
             foreach (KeyValuePair<string, CheaterConfig> entry in _onlineCheaters)
             {
-                if (entry.Value.InvisibleEnemies) enableInvisibleEnemies = true;
+                if (entry.Value.InvisibleEnemies.Enabled) enableInvisibleEnemies = true;
             }
             // enable invisible enemies
             if (enableInvisibleEnemies) InitializeInvisibleEnemies();

@@ -31,22 +31,17 @@ namespace CheaterTroll
             {
                 if (!_onlineCheaters.ContainsKey(availablePlayers[0].NetworkIDString))
                 {
+                    CheaterConfig config = new CheaterConfig
+                    {
+                        InvisibleEnemies = new InvisibleEnemiesPlayerConfig
+                        {
+                            Enabled = true
+                        }
+                    };
                     // add cheater to active cheater list
-                    _onlineCheaters.Add(
-                        availablePlayers[0].NetworkIDString,
-                        new CheaterConfig
-                        {
-                            InvisibleEnemies = true
-                        }
-                    );
-                    // add cheater to cheaters in config if they do not already exist
-                    Config.Cheater.Add(
-                        availablePlayers[0].NetworkIDString,
-                        new CheaterConfig
-                        {
-                            InvisibleEnemies = true
-                        }
-                    );
+                    _onlineCheaters.Add(availablePlayers[0].NetworkIDString, config);
+                    // add cheater to cheaters in config
+                    Config.Cheater.Add(availablePlayers[0].NetworkIDString, config);
                     // initialize listeners
                     InitializeListener();
                     command.ReplyToCommand(Localizer["command.addedplayer"].Value.Replace("{player}", availablePlayers[0].PlayerName));
