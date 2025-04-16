@@ -7,6 +7,7 @@ namespace CheaterTroll
     public class CheaterConfig
     {
         [JsonPropertyName("invisible_enemies")] public InvisibleEnemiesPlayerConfig InvisibleEnemies { get; set; } = new InvisibleEnemiesPlayerConfig();
+        [JsonPropertyName("grenade_self_damage")] public GrenadeSelfDamagePlayerConfig GrenadeSelfDamage { get; set; } = new GrenadeSelfDamagePlayerConfig();
     }
 
     public class PluginConfig : BasePluginConfig
@@ -17,6 +18,8 @@ namespace CheaterTroll
         [JsonPropertyName("debug")] public bool Debug { get; set; } = false;
         // plug-in InvisibleEnemies
         [JsonPropertyName("invisible_enemies")] public InvisibleEnemiesConfig InvisibleEnemies { get; set; } = new InvisibleEnemiesConfig();
+        // plug-in GrenadeSelfDamage
+        [JsonPropertyName("grenade_self_damage")] public GrenadeSelfDamageConfig GrenadeSelfDamage { get; set; } = new GrenadeSelfDamageConfig();
         // list of cheaters
         [JsonPropertyName("cheater")] public Dictionary<string, CheaterConfig> Cheater { get; set; } = [];
     }

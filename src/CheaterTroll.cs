@@ -39,19 +39,24 @@ namespace CheaterTroll
             DeregisterEventHandler<EventPlayerDisconnect>(OnPlayerDisconnect);
             // reset plug-ins
             ResetInvisibleEnemies();
+            ResetGrenadeSelfDamage();
             Console.WriteLine(Localizer["core.unload"]);
         }
 
         private void InitializeListener()
         {
             bool enableInvisibleEnemies = false;
+            bool enableGrenadeSelfDamage = false;
             // check if cheaters have certain features enabled
             foreach (KeyValuePair<string, CheaterConfig> entry in _onlineCheaters)
             {
                 if (entry.Value.InvisibleEnemies.Enabled) enableInvisibleEnemies = true;
+                if (entry.Value.GrenadeSelfDamage.Enabled) enableGrenadeSelfDamage = true;
             }
             // enable invisible enemies
             if (enableInvisibleEnemies) InitializeInvisibleEnemies();
+            // enable grenade self damage
+            if (enableGrenadeSelfDamage) InitializeGrenadeSelfDamage();
         }
 
         private HookResult OnPlayerConnect(EventPlayerConnectFull @event, GameEventInfo info)
