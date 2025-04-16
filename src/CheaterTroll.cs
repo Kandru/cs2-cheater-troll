@@ -40,6 +40,7 @@ namespace CheaterTroll
             // reset plug-ins
             ResetInvisibleEnemies();
             ResetGrenadeSelfDamage();
+            ResetImpossibleBombPlant();
             Console.WriteLine(Localizer["core.unload"]);
         }
 
@@ -47,16 +48,20 @@ namespace CheaterTroll
         {
             bool enableInvisibleEnemies = false;
             bool enableGrenadeSelfDamage = false;
+            bool enableImpossibleBombPlant = false;
             // check if cheaters have certain features enabled
             foreach (KeyValuePair<string, CheaterConfig> entry in _onlineCheaters)
             {
                 if (entry.Value.InvisibleEnemies.Enabled) enableInvisibleEnemies = true;
                 if (entry.Value.GrenadeSelfDamage.Enabled) enableGrenadeSelfDamage = true;
+                if (entry.Value.ImpossibleBombPlant.Enabled) enableImpossibleBombPlant = true;
             }
             // enable invisible enemies
             if (enableInvisibleEnemies) InitializeInvisibleEnemies();
             // enable grenade self damage
             if (enableGrenadeSelfDamage) InitializeGrenadeSelfDamage();
+            // enable impossible bomb plant
+            if (enableImpossibleBombPlant) InitializeImpossibleBombPlant();
         }
 
         private HookResult OnPlayerConnect(EventPlayerConnectFull @event, GameEventInfo info)
