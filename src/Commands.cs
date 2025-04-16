@@ -33,6 +33,7 @@ namespace CheaterTroll
                 {
                     CheaterConfig config = new CheaterConfig
                     {
+                        Name = availablePlayers[0].PlayerName,
                         InvisibleEnemies = new InvisibleEnemiesPlayerConfig
                         {
                             Enabled = true,
