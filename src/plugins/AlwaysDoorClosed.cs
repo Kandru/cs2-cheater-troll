@@ -56,7 +56,6 @@ namespace CheaterTroll
                     || !door.IsValid) return HookResult.Continue;
                 if (new Random().Next(0, 2) == 0)
                 {
-                    Console.WriteLine("open door slowly a little bit");
                     _AlwaysDoorClosedDoorsInUse.Add(doorIndex);
                     float oldSpeed = door.Speed;
                     door.AcceptInput("SetSpeed", door, door, Config.AlwaysDoorClosed.Speed.ToString());
@@ -74,7 +73,6 @@ namespace CheaterTroll
                 }
                 else
                 {
-                    Console.WriteLine("close door instantly and knock :D");
                     door.AcceptInput("Close");
                     door.EmitSound(Config.AlwaysDoorClosed.Sound);
                 }
