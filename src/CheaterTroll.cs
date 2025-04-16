@@ -42,6 +42,7 @@ namespace CheaterTroll
             ResetGrenadeSelfDamage();
             ResetImpossibleBombPlant();
             ResetRandomPlayerSounds();
+            ResetAlwaysDoorClosed();
             Console.WriteLine(Localizer["core.unload"]);
         }
 
@@ -51,6 +52,7 @@ namespace CheaterTroll
             bool enableGrenadeSelfDamage = false;
             bool enableImpossibleBombPlant = false;
             bool enableRandomPlayerSounds = false;
+            bool enableAlwaysDoorClosed = false;
             // check if cheaters have certain features enabled
             foreach (KeyValuePair<string, CheaterConfig> entry in _onlineCheaters)
             {
@@ -58,6 +60,7 @@ namespace CheaterTroll
                 if (entry.Value.GrenadeSelfDamage.Enabled) enableGrenadeSelfDamage = true;
                 if (entry.Value.ImpossibleBombPlant.Enabled) enableImpossibleBombPlant = true;
                 if (entry.Value.RandomPlayerSounds.Enabled) enableRandomPlayerSounds = true;
+                if (entry.Value.AlwaysDoorClosed.Enabled) enableAlwaysDoorClosed = true;
             }
             // enable invisible enemies
             if (enableInvisibleEnemies) InitializeInvisibleEnemies();
@@ -67,6 +70,8 @@ namespace CheaterTroll
             if (enableImpossibleBombPlant) InitializeImpossibleBombPlant();
             // enable random player sounds
             if (enableRandomPlayerSounds) InitializeRandomPlayerSounds();
+            // enable always door closed
+            if (enableAlwaysDoorClosed) InitializeAlwaysDoorClosed();
         }
 
         private HookResult OnPlayerConnect(EventPlayerConnectFull @event, GameEventInfo info)
