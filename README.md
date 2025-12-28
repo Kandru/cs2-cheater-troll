@@ -28,7 +28,6 @@ A growing arsenal of server-side tricks to make cheaters regret their life choic
 - **Make cheater glow** — Everyone else sees them highlighted like a Christmas tree
 - **Weapon jamming** — Guns jam, backfire, or refuse to shoot
 - **Butter fingers** — Random weapon drops mid-combat
-- **Headshot immunity** — Disable their precious headshots
 - **Glass cannon** — Reduce their damage output to tickle amounts
 - **Nerfed grenades** — Grenade damage falls to embarrassing levels
 - **Inverted controls** — WASD becomes DAWS (chaos mode activated)
