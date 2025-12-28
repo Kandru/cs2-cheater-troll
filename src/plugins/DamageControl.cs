@@ -39,7 +39,8 @@ namespace CheaterTroll.Plugins
                 || attackerPawn.Controller.Value == null
                 || !attackerPawn.Controller.Value.IsValid
                 || victimPawn == null
-                || !victimPawn.IsValid)
+                || !victimPawn.IsValid
+                || attackerPawn == victimPawn)
             {
                 return HookResult.Continue;
             }
