@@ -1,9 +1,8 @@
-namespace CheaterTroll
+namespace CheaterTroll.Enums
 {
     public enum InvisibleEnemiesMode
     {
         Full,
-        Distance,
-        Random
+        Distance
     }
 }

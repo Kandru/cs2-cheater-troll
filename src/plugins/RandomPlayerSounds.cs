@@ -1,107 +1,122 @@
-﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Cvars;
-using CounterStrikeSharp.API.Modules.Entities;
 using CounterStrikeSharp.API.Modules.Utils;
+using Microsoft.Extensions.Localization;
 
-namespace CheaterTroll
+namespace CheaterTroll.Plugins
 {
-    public partial class CheaterTroll : BasePlugin, IPluginConfig<PluginConfig>
+    public class RandomPlayerSounds : PluginBlueprint
     {
-        private bool _RandomPlayerSoundsEnabled = false;
+        public override string Description => "Random Player Sounds";
+        public override string ClassName => "RandomPlayerSounds";
+        public override List<string> Events => [
+            "EventRoundStart",
+            "EventRoundEnd"
+        ];
+        private bool _roundActive = true;
 
-        private void InitializeRandomPlayerSounds()
+        public RandomPlayerSounds(PluginConfig GlobalConfig, IStringLocalizer Localizer) : base(GlobalConfig, Localizer)
         {
-            if (!Config.RandomPlayerSounds.Enabled) return;
-            // skip if already enabled
-            if (_RandomPlayerSoundsEnabled) return;
-            // register listener
-            RegisterEventHandler<EventRoundStart>(OnRoundStart, HookMode.Pre);
-            _RandomPlayerSoundsEnabled = true;
-            DebugPrint("Plugin RandomPlayerSounds enabled");
+            Console.WriteLine(_localizer["plugins.class.initialize"].Value.Replace("{name}", ClassName));
         }
 
-        private void ResetRandomPlayerSounds()
+        public override void Add(CCSPlayerController player, CheaterConfig config)
         {
-            // remove listener
-            DeregisterEventHandler<EventRoundStart>(OnRoundStart, HookMode.Pre);
-            // disable plug-in
-            _RandomPlayerSoundsEnabled = false;
-            DebugPrint("Plugin RandomPlayerSounds disabled");
-        }
-
-        private HookResult OnRoundStart(EventRoundStart @event, GameEventInfo info)
-        {
-            DebugPrint("OnRoundStart");
-            int? currentRound = GetGameRules()?.TotalRoundsPlayed;
-            ConVar? mpFreezeTime = ConVar.Find("mp_freezetime");
-            if (currentRound == null
-                || mpFreezeTime == null) return HookResult.Continue;
-            foreach (var kvp in _onlineCheaters)
+            // check if player is valid and has a pawn
+            if (player == null
+                || !player.IsValid
+                || player.Pawn?.Value == null
+                || !player.Pawn.Value.IsValid)
             {
-                if (kvp.Value.RandomPlayerSounds.Enabled)
+                return;
+            }
+            _players.Add(player, config);
+            if (_roundActive)
+            {
+                // make a random player sound
+                MakeRandomPlayerSound(player);
+            }
+        }
+
+        public HookResult EventRoundStart(EventRoundStart @event, GameEventInfo info)
+        {
+            _roundActive = true;
+            ConVar? mpFreezeTime = ConVar.Find("mp_freezetime");
+            if (mpFreezeTime == null)
+            {
+                return HookResult.Continue;
+            }
+
+            foreach (KeyValuePair<CCSPlayerController, CheaterConfig> kvp in _players)
+            {
+                // wait for freeze time before playing the first sound
+                _ = new CounterStrikeSharp.API.Modules.Timers.Timer(mpFreezeTime.GetPrimitiveValue<int>() + _globalConfig.Plugins.RandomPlayerSounds.WaitTime, () =>
                 {
-                    // get player entity
-                    CCSPlayerController? player = Utilities.GetPlayerFromSteamId(new SteamID(kvp.Key).SteamId64);
-                    if (player == null
-                        || !player.IsValid) continue;
-                    // wait for freeze time before playing the first sound
-                    AddTimer(mpFreezeTime.GetPrimitiveValue<int>() + Config.RandomPlayerSounds.WaitTime, () =>
-                    {
-                        // make a random player sound
-                        MakeRandomPlayerSound(player, (int)currentRound);
-                    });
-                }
+                    // make a random player sound
+                    MakeRandomPlayerSound(kvp.Key);
+                });
             }
             return HookResult.Continue;
         }
 
-        private void MakeRandomPlayerSound(CCSPlayerController? player, int currentRound, string? lastSound = null)
+        public HookResult EventRoundEnd(EventRoundEnd @event, GameEventInfo info)
         {
+            _roundActive = false;
+            return HookResult.Continue;
+        }
+
+        private void MakeRandomPlayerSound(CCSPlayerController player, string? lastSound = null)
+        {
+            if (!_roundActive
+                || player == null
+                || !player.IsValid
+                || !_players.ContainsKey(player)
+                || player.PlayerPawn == null || !player.PlayerPawn.IsValid || player.PlayerPawn.Value == null
+                || player.PlayerPawn.Value.LifeState != (byte)LifeState_t.LIFE_ALIVE)
+            {
+                return;
+            }
             // get random sound
             // Avoid repeating the last sound if it exists
             RandomPlayerSoundConfig? sound = null;
-            if (Config.RandomPlayerSounds.Sounds.Count > 0)
+            if (_globalConfig.Plugins.RandomPlayerSounds.Sounds.Count > 0)
             {
                 // Get all sounds except the last one played
-                var availableSounds = Config.RandomPlayerSounds.Sounds
-                    .Where(s => lastSound == null || s.Name != lastSound)
-                    .ToList();
+                List<RandomPlayerSoundConfig> availableSounds = [.. _globalConfig.Plugins.RandomPlayerSounds.Sounds.Where(s => lastSound == null || s.Name != lastSound)];
                 // If we have available sounds (or if all sounds are used up), pick one randomly
-                if (availableSounds.Count > 0)
-                    sound = availableSounds[Random.Shared.Next(availableSounds.Count)];
-                else
-                    sound = Config.RandomPlayerSounds.Sounds[Random.Shared.Next(Config.RandomPlayerSounds.Sounds.Count)];
+                sound = availableSounds.Count > 0
+                    ? availableSounds[Random.Shared.Next(availableSounds.Count)]
+                    : _globalConfig.Plugins.RandomPlayerSounds.Sounds[Random.Shared.Next(_globalConfig.Plugins.RandomPlayerSounds.Sounds.Count)];
             }
-            if (sound == null
-                || player == null
-                || !player.IsValid
-                || GetGameRules()?.TotalRoundsPlayed != currentRound
-                || player.PlayerPawn == null || !player.PlayerPawn.IsValid || player.PlayerPawn.Value == null
-                || player.PlayerPawn.Value.LifeState != (byte)LifeState_t.LIFE_ALIVE) return;
-            DebugPrint($"MakeRandomPlayerSound -> {sound.Name}");
+            if (sound == null)
+            {
+                return;
+            }
             // play sound
             for (int i = 0; i < sound.Amount; i++)
             {
                 // add timer for the sounds
-                AddTimer(sound.Interval * i, () =>
+                _ = new CounterStrikeSharp.API.Modules.Timers.Timer(sound.Interval * i, () =>
                 {
                     if (player == null
                         || !player.IsValid
                         || player.PlayerPawn == null || !player.PlayerPawn.IsValid || player.PlayerPawn.Value == null
-                        || player.PlayerPawn.Value.LifeState != (byte)LifeState_t.LIFE_ALIVE) return;
+                        || player.PlayerPawn.Value.LifeState != (byte)LifeState_t.LIFE_ALIVE)
+                    {
+                        return;
+                    }
+
                     RecipientFilter filter = [player];
-                    player.EmitSound(sound.Name, filter);
+                    _ = player.EmitSound(sound.Name, filter);
                 });
             }
             // wait random time before playing the next sound
-            int randomTime = Random.Shared.Next(Config.RandomPlayerSounds.RandomMinTime, Config.RandomPlayerSounds.RandomMaxTime);
-            AddTimer(randomTime, () =>
+            int randomTime = Random.Shared.Next(_globalConfig.Plugins.RandomPlayerSounds.RandomMinTime, _globalConfig.Plugins.RandomPlayerSounds.RandomMaxTime);
+            _ = new CounterStrikeSharp.API.Modules.Timers.Timer(randomTime, () =>
             {
                 // make a random player sound
-                MakeRandomPlayerSound(player, currentRound, sound.Name);
+                MakeRandomPlayerSound(player, sound.Name);
             });
         }
     }
-
 }

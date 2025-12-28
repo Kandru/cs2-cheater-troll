@@ -1,3 +1,4 @@
+using CheaterTroll.Enums;
 using System.Text.Json.Serialization;
 
 namespace CheaterTroll
@@ -10,45 +11,23 @@ namespace CheaterTroll
         [JsonPropertyName("mode")]
         public string DefaultModeString
         {
-            get => DefaultMode.ToString();
-            set
-            {
-                if (Enum.TryParse<InvisibleEnemiesMode>(value, true, out var result))
-                    DefaultMode = result;
-                else
-                    DefaultMode = InvisibleEnemiesMode.Distance;
-            }
+            get => DefaultMode.ToString(); set => DefaultMode = Enum.TryParse(value, true, out InvisibleEnemiesMode result) ? result : InvisibleEnemiesMode.Full;
         }
-        //// mode "distance
-        // minimum distance to be invisible (in-game units)
-        [JsonPropertyName("mode-distance-distance")] public int Distance { get; set; } = 750;
-        //// mode "random"
-        // percentage of enemies to be invisible at any given time
-        [JsonPropertyName("mode-random-percentage")] public int RandomPercentage { get; set; } = 75;
-        // minimum time to change invisible enemies in seconds
-        [JsonPropertyName("mode-random-min_time")] public int RandomMinTime { get; set; } = 2;
-        // maximum time to change invisible enemies in seconds
-        [JsonPropertyName("mode-random-max_time")] public int RandomMaxTime { get; set; } = 5;
     }
 
 
     public class InvisibleEnemiesPlayerConfig
     {
         // enabled
-        [JsonPropertyName("enabled")] public bool Enabled { get; set; } = true;
+        [JsonPropertyName("enabled")] public bool Enabled { get; set; } = false;
         // mode
         [JsonIgnore] public InvisibleEnemiesMode Mode { get; set; } = InvisibleEnemiesMode.Full;
         [JsonPropertyName("mode")]
         public string ModeString
         {
-            get => Mode.ToString();
-            set
-            {
-                if (Enum.TryParse<InvisibleEnemiesMode>(value, true, out var result))
-                    Mode = result;
-                else
-                    Mode = InvisibleEnemiesMode.Full;
-            }
+            get => Mode.ToString(); set => Mode = Enum.TryParse(value, true, out InvisibleEnemiesMode result) ? result : InvisibleEnemiesMode.Full;
         }
+        // maximum distance to be invisible (in-game units)
+        [JsonPropertyName("mode_distance_maximum_distance")] public int Distance { get; set; } = 750;
     }
 }

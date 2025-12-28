@@ -1,9 +1,14 @@
 {
     "core.hotreload": "{green}[CheaterTroll] {default}Hot-Reloaded!",
     "core.unload": "[CheaterTroll] Unloaded CheaterTroll Plugin!",
+    "core.config": "[CheaterTroll] Config loaded!",
     "core.debugprint": "[CheaterTroll]{red}[DEBUG] {default}{message}",
+    "command.menu.title": "[CheaterTroll] Menu",
+    "command.menu.config.title": "[CheaterTroll] Configuration for {player}",
+    "command.playernotfound": "[CheaterTroll] {default}Player {green}{player} {default}not found",
     "command.noplayers": "[CheaterTroll] {default}no players found.",
     "command.toomanyplayers": "[CheaterTroll] {default}Too many players found.",
     "command.addedplayer": "[CheaterTroll] {default}Added {green}{player}{default}.",
-    "command.removedplayer": "[CheaterTroll] {default}Removed {green}{player}{default}."
+    "command.removedplayer": "[CheaterTroll] {default}Removed {green}{player}{default}.",
+    "plugins.class.initialize": "[CheaterTroll] {name} initialized!"
 }

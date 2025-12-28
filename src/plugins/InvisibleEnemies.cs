@@ -1,125 +1,96 @@
-﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
+using CheaterTroll.Enums;
+using CheaterTroll.Utils;
+using Microsoft.Extensions.Localization;
 
-namespace CheaterTroll
+namespace CheaterTroll.Plugins
 {
-    public partial class CheaterTroll : BasePlugin, IPluginConfig<PluginConfig>
+    public class InvisibleEnemies : PluginBlueprint
     {
-        private bool _InvisibleEnemiesEnabled = false;
-        private Dictionary<string, List<CCSPlayerController>> _InvisibleEnemiesModeRandom = [];
-        private float _InvisibleEnemiesModeRandomNextChange = 0;
+        public override string Description => "Invisible Enemies";
+        public override string ClassName => "InvisibleEnemies";
+        public override List<string> Listeners => [
+            "CheckTransmit"
+        ];
 
-        private void InitializeInvisibleEnemies()
+        public InvisibleEnemies(PluginConfig GlobalConfig, IStringLocalizer Localizer) : base(GlobalConfig, Localizer)
         {
-            if (!Config.InvisibleEnemies.Enabled) return;
-            // check type of InvisibleEnemies for each player and initialize accordingly
-            foreach (KeyValuePair<string, CheaterConfig> entry in _onlineCheaters)
-            {
-                if (entry.Value.InvisibleEnemies.Mode == InvisibleEnemiesMode.Random) _InvisibleEnemiesModeRandom.Add(entry.Key, []);
-            }
-            // skip if already enabled
-            if (_InvisibleEnemiesEnabled) return;
-            // register listener
-            RegisterListener<Listeners.CheckTransmit>(EventInvisibleEnemiesCheckTransmit);
-            _InvisibleEnemiesEnabled = true;
-            DebugPrint("Plugin InvisibleEnemies enabled");
+            Console.WriteLine(_localizer["plugins.class.initialize"].Value.Replace("{name}", ClassName));
         }
 
-        private void ResetInvisibleEnemies()
+        public override void Add(CCSPlayerController player, CheaterConfig config)
         {
-            // remove listener
-            RemoveListener<Listeners.CheckTransmit>(EventInvisibleEnemiesCheckTransmit);
-            // disable plug-in
-            _InvisibleEnemiesEnabled = false;
-            _InvisibleEnemiesModeRandom.Clear();
-            _InvisibleEnemiesModeRandomNextChange = 0;
-            DebugPrint("Plugin InvisibleEnemies disabled");
-        }
-
-        private void EventInvisibleEnemiesCheckTransmit(CCheckTransmitInfoList infoList)
-        {
-            // remove listener if no players to save resources
-            if (_onlineCheaters.Count() == 0)
+            // check if player is valid and has a pawn
+            if (player == null
+                || !player.IsValid
+                || player.Pawn?.Value == null
+                || !player.Pawn.Value.IsValid)
             {
-                ResetInvisibleEnemies();
                 return;
             }
-            // check if it is time to change invisible enemies for players
-            bool isTimeToChangeRandom = false;
-            if (_InvisibleEnemiesModeRandom.Count > 0
-                && _InvisibleEnemiesModeRandomNextChange <= Server.CurrentTime)
+            _players.Add(player, config);
+        }
+
+        public override void Remove(CCSPlayerController player)
+        {
+            _ = _players.Remove(player);
+        }
+
+        public override void Reset()
+        {
+            _players.Clear();
+        }
+
+        public override void Destroy()
+        {
+            Reset();
+        }
+
+        public void CheckTransmit(CCheckTransmitInfoList infoList)
+        {
+            // stop if no players have InvisibleEnemies enabled
+            if (_players.Count == 0)
             {
-                // Set next change time to a random value between MinTime and MaxTime
-                _InvisibleEnemiesModeRandomNextChange = Server.CurrentTime
-                    + (float)Random.Shared.NextDouble()
-                    * (Config.InvisibleEnemies.RandomMaxTime
-                    - Config.InvisibleEnemies.RandomMinTime)
-                    + Config.InvisibleEnemies.RandomMinTime;
-                isTimeToChangeRandom = true;
+                return;
             }
+
             // worker
             foreach ((CCheckTransmitInfo info, CCSPlayerController? player) in infoList)
             {
-                // check if player is in config and has InvisibleEnemies enabled
+                // check if player is cheater
                 if (player == null
                     || !player.IsValid
-                    || string.IsNullOrEmpty(player.NetworkIDString)
-                    || !_onlineCheaters.ContainsKey(player.NetworkIDString)
-                    || !_onlineCheaters[player.NetworkIDString].InvisibleEnemies.Enabled
+                    || player.IsBot
+                    || player.IsHLTV
+                    || !_players.ContainsKey(player)
                     || player.PlayerPawn == null || !player.PlayerPawn.IsValid || player.PlayerPawn.Value == null
                     || player.PlayerPawn.Value.AbsOrigin == null
                     || (player.TeamNum != (int)CsTeam.Terrorist && player.TeamNum != (int)CsTeam.CounterTerrorist)
-                    || player.PlayerPawn.Value.LifeState != (byte)LifeState_t.LIFE_ALIVE) continue;
-                // check if player has random invisible enemies
-                if (_onlineCheaters[player.NetworkIDString].InvisibleEnemies.Mode == InvisibleEnemiesMode.Random && isTimeToChangeRandom)
+                    || player.PlayerPawn.Value.LifeState != (byte)LifeState_t.LIFE_ALIVE)
                 {
-                    // Get all valid enemies who are alive
-                    var enemies = Utilities.GetPlayers()
-                        .Where(entry => entry.IsValid
-                            && !entry.IsHLTV
-                            && (entry.TeamNum == (int)CsTeam.Terrorist || entry.TeamNum == (int)CsTeam.CounterTerrorist)
-                            && entry.TeamNum != player.TeamNum
-                            && entry.PlayerPawn != null
-                            && entry.PlayerPawn.IsValid
-                            && entry.PlayerPawn.Value != null
-                            && entry.PlayerPawn.Value.LifeState == (byte)LifeState_t.LIFE_ALIVE)
-                        .ToList();
-                    // Calculate how many enemies to make invisible based on RandomPercentage
-                    int invisibleCount = (int)Math.Ceiling(enemies.Count * (Config.InvisibleEnemies.RandomPercentage / 100.0f));
-                    // Randomly select which enemies to make invisible
-                    _InvisibleEnemiesModeRandom[player.NetworkIDString] = [.. enemies
-                        .OrderBy(_ => Random.Shared.Next())
-                        .Take(invisibleCount)
-                        .Select(e => e)];
+                    continue;
                 }
                 // check which enemies not to transmit (only when they are alive)
-                foreach (CCSPlayerController entry in Utilities.GetPlayers())
+                foreach (CCSPlayerController entry in Utilities.GetPlayers().Where(p =>
+                    (p.TeamNum == (int)CsTeam.Terrorist || p.TeamNum == (int)CsTeam.CounterTerrorist)
+                    && p.TeamNum != player.TeamNum
+                    && p.PlayerPawn != null
+                    && p.PlayerPawn.IsValid
+                    && p.PlayerPawn.Value != null
+                    && p.PlayerPawn.Value.AbsOrigin != null
+                    && p.PlayerPawn.Value.LifeState == (byte)LifeState_t.LIFE_ALIVE
+                    && (
+                        // mode "Full"
+                        _players[player].InvisibleEnemies.Mode == InvisibleEnemiesMode.Full
+                        // mode "Distance"
+                        || (_players[player].InvisibleEnemies.Mode == InvisibleEnemiesMode.Distance
+                            && Vectors.GetDistance(player.PlayerPawn.Value.AbsOrigin, p.PlayerPawn.Value.AbsOrigin) < _players[player].InvisibleEnemies.Distance)
+                    )))
                 {
-                    // check if player is in enemy team and alive
-                    if ((entry.TeamNum == (int)CsTeam.Terrorist || entry.TeamNum == (int)CsTeam.CounterTerrorist)
-                        && !string.IsNullOrEmpty(entry.NetworkIDString)
-                        && entry.TeamNum != player.TeamNum
-                        && entry.PlayerPawn != null
-                        && entry.PlayerPawn.IsValid
-                        && entry.PlayerPawn.Value != null
-                        && entry.PlayerPawn.Value.AbsOrigin != null
-                        && entry.PlayerPawn.Value.LifeState == (byte)LifeState_t.LIFE_ALIVE
-                        // check of specific type of InvisibleEnemies
-                        && (
-                            // mode "Full"
-                            _onlineCheaters[player.NetworkIDString].InvisibleEnemies.Mode == InvisibleEnemiesMode.Full
-                            // mode "Random"
-                            || _onlineCheaters[player.NetworkIDString].InvisibleEnemies.Mode == InvisibleEnemiesMode.Random
-                                && _InvisibleEnemiesModeRandom[player.NetworkIDString].Contains(entry)
-                            // mode "Distance"
-                            || _onlineCheaters[player.NetworkIDString].InvisibleEnemies.Mode == InvisibleEnemiesMode.Distance
-                                && GetVectorDistance(player.PlayerPawn.Value.AbsOrigin, entry.PlayerPawn.Value.AbsOrigin) < Config.InvisibleEnemies.Distance
-                        ))
-                    {
-                        // do not transmit ;)
-                        info.TransmitEntities.Remove(entry.PlayerPawn.Value);
-                    }
+                    // do not transmit ;)
+                    info.TransmitEntities.Remove(entry.PlayerPawn!.Value!);
                 }
             }
         }

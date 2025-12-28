@@ -1,9 +1,14 @@
 {
     "core.hotreload": "[CheaterTroll] Neu geladen! Würfen ab nächster Runde!",
     "core.unload": "[CheaterTroll] CheaterTroll Plugin entladen!",
+    "core.config": "[CheaterTroll] Konfiguration geladen.",
     "core.debugprint": "[CheaterTroll]{red}[DEBUG] {default}{message}",
+    "command.menu.title": "[CheaterTroll] Menü",
+    "command.menu.config.title": "[CheaterTroll] Konfiguration for {player}",
+    "command.playernotfound": "[CheaterTroll] {default}Spieler {green}{player} {default}nicht gefunden",
     "command.noplayers": "[CheaterTroll] {default}keinen Spieler gefunden.",
     "command.toomanyplayers": "[CheaterTroll] {default}Zu viele Spieler gefunden.",
     "command.addedplayer": "[CheaterTroll] {default}Spieler {green}{player}{default} hinzugefügt.",
-    "command.removedplayer": "[CheaterTroll] {default}Spieler {green}{player}{default} entfernt."
+    "command.removedplayer": "[CheaterTroll] {default}Spieler {green}{player}{default} entfernt.",
+    "plugins.class.initialize": "[CheaterTroll] {default}Plugin {green}{name} {default}initialisiert."
 }

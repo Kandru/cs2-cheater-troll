@@ -1,5 +1,9 @@
 ﻿using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
+using CounterStrikeSharp.API.Modules.Extensions;
+using CheaterTroll.Enums;
+using CheaterTroll.Plugins;
+using CheaterTroll.Utils;
 
 namespace CheaterTroll
 {
@@ -8,26 +12,30 @@ namespace CheaterTroll
         public override string ModuleName => "Cheater Troll";
         public override string ModuleAuthor => "Kalle <kalle@kandru.de>";
 
-        private Dictionary<string, CheaterConfig> _onlineCheaters = [];
+
+        // use a dictionary for the connected players to save information for further use:
+        // - the player name on connection to avoid fast name-changing hacks and allow the player to be identified properly
+        // entries: name, steam_id, timestamp (CurrentTime)
+        private readonly Dictionary<CCSPlayerController, Dictionary<PlayerData, string>> _connectedPlayers = [];
+        // current active cheaters on our server
+        private readonly Dictionary<CCSPlayerController, CheaterConfig> _activeCheaters = [];
+        private readonly List<PluginBlueprint> _plugins = [];
 
         public override void Load(bool hotReload)
         {
             // register listeners
-            RegisterEventHandler<EventPlayerConnectFull>(OnPlayerConnect);
+            RegisterListener<Listeners.OnMapStart>(OnMapStart);
+            RegisterListener<Listeners.OnMapEnd>(OnMapEnd);
+            RegisterEventHandler<EventPlayerConnectFull>(OnPlayerConnectFull);
             RegisterEventHandler<EventPlayerDisconnect>(OnPlayerDisconnect);
+            // register plugins
+            InitializeModules();
             // check for hot reload
             if (hotReload)
             {
-                // check if cheaters are on our server if hot-reloaded
-                foreach (CCSPlayerController entry in Utilities.GetPlayers().Where(p => p.IsValid && !p.IsBot && !p.IsHLTV))
-                {
-                    if (Config.Cheater.TryGetValue(entry.NetworkIDString, out CheaterConfig? cheaterConfig))
-                    {
-                        _onlineCheaters.Add(entry.NetworkIDString, cheaterConfig);
-                    }
-                }
-                // initialize listeners if cheaters are online
-                InitializeListener();
+                UpdatePlayerInfos();
+                LoadCheaterConfigs();
+                EnableAllPlayerCheats();
                 Console.WriteLine(Localizer["core.hotreload"]);
             }
         }
@@ -35,58 +43,52 @@ namespace CheaterTroll
         public override void Unload(bool hotReload)
         {
             // unregister listeners
-            DeregisterEventHandler<EventPlayerConnectFull>(OnPlayerConnect);
+            RemoveListener<Listeners.OnMapStart>(OnMapStart);
+            RemoveListener<Listeners.OnMapEnd>(OnMapEnd);
+            DeregisterEventHandler<EventPlayerConnectFull>(OnPlayerConnectFull);
             DeregisterEventHandler<EventPlayerDisconnect>(OnPlayerDisconnect);
-            // reset plug-ins
-            ResetInvisibleEnemies();
-            ResetGrenadeSelfDamage();
-            ResetImpossibleBombPlant();
-            ResetRandomPlayerSounds();
-            ResetAlwaysDoorClosed();
+            // unload plugins
+            DestroyModules();
+            // save configs
+            SaveCheaterConfigs();
+            // write config to disk
+            Config.Update();
             Console.WriteLine(Localizer["core.unload"]);
         }
 
-        private void InitializeListener()
+        private void OnMapStart(string mapName)
         {
-            bool enableInvisibleEnemies = false;
-            bool enableGrenadeSelfDamage = false;
-            bool enableImpossibleBombPlant = false;
-            bool enableRandomPlayerSounds = false;
-            bool enableAlwaysDoorClosed = false;
-            // check if cheaters have certain features enabled
-            foreach (KeyValuePair<string, CheaterConfig> entry in _onlineCheaters)
-            {
-                if (entry.Value.InvisibleEnemies.Enabled) enableInvisibleEnemies = true;
-                if (entry.Value.GrenadeSelfDamage.Enabled) enableGrenadeSelfDamage = true;
-                if (entry.Value.ImpossibleBombPlant.Enabled) enableImpossibleBombPlant = true;
-                if (entry.Value.RandomPlayerSounds.Enabled) enableRandomPlayerSounds = true;
-                if (entry.Value.AlwaysDoorClosed.Enabled) enableAlwaysDoorClosed = true;
-            }
-            // enable invisible enemies
-            if (enableInvisibleEnemies) InitializeInvisibleEnemies();
-            // enable grenade self damage
-            if (enableGrenadeSelfDamage) InitializeGrenadeSelfDamage();
-            // enable impossible bomb plant
-            if (enableImpossibleBombPlant) InitializeImpossibleBombPlant();
-            // enable random player sounds
-            if (enableRandomPlayerSounds) InitializeRandomPlayerSounds();
-            // enable always door closed
-            if (enableAlwaysDoorClosed) InitializeAlwaysDoorClosed();
+            // initialize plugins
+            InitializeModules();
         }
 
-        private HookResult OnPlayerConnect(EventPlayerConnectFull @event, GameEventInfo info)
+        private void OnMapEnd()
+        {
+            SaveCheaterConfigs();
+            DestroyModules();
+            _activeCheaters.Clear();
+            _clientConsoleMenu.ClearAllStates();
+            Config.Update();
+        }
+
+        private HookResult OnPlayerConnectFull(EventPlayerConnectFull @event, GameEventInfo info)
         {
             CCSPlayerController? player = @event.Userid;
             if (player == null
-                || !player.IsValid
-                || string.IsNullOrEmpty(player.NetworkIDString)
-                || !Config.Cheater.ContainsKey(player.NetworkIDString)) return HookResult.Continue;
-            // add cheater to active cheaters if in config
-            _onlineCheaters.Add(
-                player.NetworkIDString,
-                Config.Cheater[player.NetworkIDString]);
-            // initialize listener
-            InitializeListener();
+                || !player.IsValid)
+            {
+                return HookResult.Continue;
+            }
+            // update player info for future usage
+            UpdatePlayerInfo(player);
+            // check if this is a cheater
+            if (string.IsNullOrEmpty(player.SteamID.ToString())
+                || !Config.Cheater.ContainsKey(player.SteamID.ToString()))
+            {
+                return HookResult.Continue;
+            }
+            // load cheater config
+            LoadCheaterConfig(player);
             return HookResult.Continue;
         }
 
@@ -94,12 +96,220 @@ namespace CheaterTroll
         {
             CCSPlayerController? player = @event.Userid;
             if (player == null
-                || !player.IsValid
-                || string.IsNullOrEmpty(player.NetworkIDString)
-                || !_onlineCheaters.ContainsKey(player.NetworkIDString)) return HookResult.Continue;
-            // remove cheater from active cheaters (but keep in config)
-            _onlineCheaters.Remove(player.NetworkIDString);
+                || !player.IsValid)
+            {
+                return HookResult.Continue;
+            }
+
+            // remove player info
+            RemovePlayerInfo(player);
+            // remove client console menu state
+            _clientConsoleMenu.RemovePlayerState(player);
+            // check if player is a cheater
+            if (!_activeCheaters.ContainsKey(player))
+            {
+                return HookResult.Continue;
+            }
+            // save config for player
+            SaveCheaterConfig(player);
+            // remove plugins for player
+            RemovePluginsForUser(player);
+            // remove player from list
+            _ = _activeCheaters.Remove(player);
             return HookResult.Continue;
+        }
+
+        private void InitializeModules()
+        {
+            if (_plugins.Count > 0)
+            {
+                return;
+            }
+
+            // plug-in invisible enemies
+            if (Config.Plugins.InvisibleEnemies.Enabled)
+            {
+                _plugins.Add(new InvisibleEnemies(Config, Localizer));
+            }
+
+            // plug-in random player sounds
+            if (Config.Plugins.RandomPlayerSounds.Enabled)
+            {
+                _plugins.Add(new RandomPlayerSounds(Config, Localizer));
+            }
+
+            // plug-in grenade self damage
+            if (Config.Plugins.GrenadeSelfDamage.Enabled)
+            {
+                _plugins.Add(new GrenadeSelfDamage(Config, Localizer));
+            }
+
+            // plug-in impossible bomb plant
+            if (Config.Plugins.ImpossibleBombPlant.Enabled)
+            {
+                _plugins.Add(new ImpossibleBombPlant(Config, Localizer));
+            }
+
+            // plug-in door gate
+            if (Config.Plugins.DoorGate.Enabled)
+            {
+                _plugins.Add(new DoorGate(Config, Localizer));
+            }
+
+            // register listeners
+            RegisterListeners();
+            RegisterEventHandlers();
+            RegisterUserMessageHooks();
+        }
+
+        private void DestroyModules()
+        {
+            // deregister listeners
+            DeregisterListeners();
+            DeregisterEventHandlers();
+            DeregisterUserMessageHooks();
+            // destroy all cosmetics modules
+            foreach (PluginBlueprint module in _plugins)
+            {
+                module.Destroy();
+            }
+            _plugins.Clear();
+        }
+
+        private void RegisterListeners()
+        {
+            foreach (PluginBlueprint module in _plugins)
+            {
+                //DebugPrint($"Initializing listener for module {module.GetType().Name}");
+                foreach (string listenerName in module.Listeners)
+                {
+                    //DebugPrint($"- {listenerName}");
+                    DynamicHandlers.RegisterModuleListener(this, listenerName, module);
+                }
+            }
+        }
+
+        private void DeregisterListeners()
+        {
+            foreach (PluginBlueprint module in _plugins)
+            {
+                //DebugPrint($"Destroying listener for module {module.GetType().Name}");
+                foreach (string listenerName in module.Listeners)
+                {
+                    //DebugPrint($"- {listenerName}");
+                    DynamicHandlers.DeregisterModuleListener(this, listenerName, module);
+                }
+            }
+        }
+
+        private void RegisterEventHandlers()
+        {
+            foreach (PluginBlueprint module in _plugins)
+            {
+                //DebugPrint($"Initializing event handlers for module {module.GetType().Name}");
+                foreach (string eventName in module.Events)
+                {
+                    //DebugPrint($"- {eventName}");
+                    DynamicHandlers.RegisterModuleEventHandler(this, eventName, module);
+                }
+            }
+        }
+
+        private void DeregisterEventHandlers()
+        {
+            foreach (PluginBlueprint module in _plugins)
+            {
+                //DebugPrint($"Destroying event handlers for module {module.GetType().Name}");
+                foreach (string eventName in module.Events)
+                {
+                    //DebugPrint($"- {eventName}");
+                    DynamicHandlers.DeregisterModuleEventHandler(this, eventName, module);
+                }
+            }
+        }
+
+        private void RegisterUserMessageHooks()
+        {
+            foreach (PluginBlueprint module in _plugins)
+            {
+                //DebugPrint($"Registering user messages for module {module.GetType().Name}");
+                foreach ((int userMessageId, HookMode hookMode) in module.UserMessages)
+                {
+                    //DebugPrint($"- UserMessage ID: {userMessageId}, HookMode: {hookMode}");
+                    DynamicHandlers.RegisterUserMessageHook(this, userMessageId, module, hookMode);
+                }
+            }
+        }
+
+        private void DeregisterUserMessageHooks()
+        {
+            foreach (PluginBlueprint module in _plugins)
+            {
+                //DebugPrint($"Deregistering user messages for module {module.GetType().Name}");
+                foreach ((int userMessageId, HookMode hookMode) in module.UserMessages)
+                {
+                    //DebugPrint($"- UserMessage ID: {userMessageId}, HookMode: {hookMode}");
+                    DynamicHandlers.DeregisterUserMessageHook(this, userMessageId, module, hookMode);
+                }
+            }
+        }
+
+        private void RemovePluginsForUser(CCSPlayerController? player)
+        {
+            if (player == null
+                || !player.IsValid)
+            {
+                return;
+            }
+            // remove the plugins for the player (if any)
+            foreach (PluginBlueprint plugin in _plugins)
+            {
+                if (plugin._players.ContainsKey(player))
+                {
+                    plugin.Remove(player);
+                }
+            }
+        }
+
+        private void UpdatePlayerInfos()
+        {
+            // update all player infos
+            foreach (CCSPlayerController entry in Utilities.GetPlayers().Where(static p => !p.IsBot && !p.IsHLTV))
+            {
+                UpdatePlayerInfo(entry);
+            }
+        }
+
+        private void UpdatePlayerInfo(CCSPlayerController player)
+        {
+            if (player == null
+                || !player.IsValid)
+            {
+                return;
+            }
+            // add player to dictionary
+            if (!_connectedPlayers.ContainsKey(player))
+            {
+                _connectedPlayers.Add(player, []);
+            }
+            // update player data in dictionary
+            _connectedPlayers[player][PlayerData.PLAYER_NAME] = player.PlayerName;
+            _connectedPlayers[player][PlayerData.STEAM_ID] = player.SteamID.ToString();
+            _connectedPlayers[player][PlayerData.TIMESTAMP] = Server.CurrentTime.ToString();
+        }
+
+        private void RemovePlayerInfo(CCSPlayerController player)
+        {
+            if (player == null
+                || !player.IsValid)
+            {
+                return;
+            }
+            // remove player from dictionary
+            if (_connectedPlayers.ContainsKey(player))
+            {
+                _ = _connectedPlayers.Remove(player);
+            }
         }
     }
 }

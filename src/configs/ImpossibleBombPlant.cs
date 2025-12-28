@@ -12,6 +12,6 @@ namespace CheaterTroll
     public class ImpossibleBombPlantPlayerConfig
     {
         // enabled
-        [JsonPropertyName("enabled")] public bool Enabled { get; set; } = true;
+        [JsonPropertyName("enabled")] public bool Enabled { get; set; } = false;
     }
 }

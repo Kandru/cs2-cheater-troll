@@ -1,4 +1,5 @@
-﻿using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Extensions;
 using System.Text.Json.Serialization;
 
@@ -11,7 +12,17 @@ namespace CheaterTroll
         [JsonPropertyName("grenade_self_damage")] public GrenadeSelfDamagePlayerConfig GrenadeSelfDamage { get; set; } = new GrenadeSelfDamagePlayerConfig();
         [JsonPropertyName("impossible_bomb_plant")] public ImpossibleBombPlantPlayerConfig ImpossibleBombPlant { get; set; } = new ImpossibleBombPlantPlayerConfig();
         [JsonPropertyName("random_player_sounds")] public RandomPlayerSoundsPlayerConfig RandomPlayerSounds { get; set; } = new RandomPlayerSoundsPlayerConfig();
-        [JsonPropertyName("always_door_closed")] public AlwaysDoorClosedPlayerConfig AlwaysDoorClosed { get; set; } = new AlwaysDoorClosedPlayerConfig();
+        [JsonPropertyName("always_door_closed")] public DoorGatePlayerConfig DoorGate { get; set; } = new DoorGatePlayerConfig();
+    }
+
+    public class PluginsConfig
+    {
+        [JsonPropertyName("name")] public string Name { get; set; } = string.Empty;
+        [JsonPropertyName("invisible_enemies")] public InvisibleEnemiesConfig InvisibleEnemies { get; set; } = new InvisibleEnemiesConfig();
+        [JsonPropertyName("grenade_self_damage")] public GrenadeSelfDamageConfig GrenadeSelfDamage { get; set; } = new GrenadeSelfDamageConfig();
+        [JsonPropertyName("impossible_bomb_plant")] public ImpossibleBombPlantConfig ImpossibleBombPlant { get; set; } = new ImpossibleBombPlantConfig();
+        [JsonPropertyName("random_player_sounds")] public RandomPlayerSoundsConfig RandomPlayerSounds { get; set; } = new RandomPlayerSoundsConfig();
+        [JsonPropertyName("always_door_closed")] public DoorGateConfig DoorGate { get; set; } = new DoorGateConfig();
     }
 
     public class PluginConfig : BasePluginConfig
@@ -20,16 +31,8 @@ namespace CheaterTroll
         [JsonPropertyName("enabled")] public bool Enabled { get; set; } = true;
         // debug prints
         [JsonPropertyName("debug")] public bool Debug { get; set; } = false;
-        // plug-in InvisibleEnemies
-        [JsonPropertyName("invisible_enemies")] public InvisibleEnemiesConfig InvisibleEnemies { get; set; } = new InvisibleEnemiesConfig();
-        // plug-in GrenadeSelfDamage
-        [JsonPropertyName("grenade_self_damage")] public GrenadeSelfDamageConfig GrenadeSelfDamage { get; set; } = new GrenadeSelfDamageConfig();
-        // plug-in ImpossibleBombPlant
-        [JsonPropertyName("impossible_bomb_plant")] public ImpossibleBombPlantConfig ImpossibleBombPlant { get; set; } = new ImpossibleBombPlantConfig();
-        // plug-in RandomPlayerSounds
-        [JsonPropertyName("random_player_sounds")] public RandomPlayerSoundsConfig RandomPlayerSounds { get; set; } = new RandomPlayerSoundsConfig();
-        // plug-in AlwaysDoorClosed
-        [JsonPropertyName("always_door_closed")] public AlwaysDoorClosedConfig AlwaysDoorClosed { get; set; } = new AlwaysDoorClosedConfig();
+        // global config
+        [JsonPropertyName("global_config")] public PluginsConfig Plugins { get; set; } = new();
         // list of cheaters
         [JsonPropertyName("cheater")] public Dictionary<string, CheaterConfig> Cheater { get; set; } = [];
     }
@@ -44,6 +47,63 @@ namespace CheaterTroll
             // update configuration with latest plugin changes
             Config.Update();
             Console.WriteLine(Localizer["core.config"]);
+        }
+
+        private void LoadCheaterConfigs()
+        {
+            // load all cheater configs
+            foreach (CCSPlayerController entry in Utilities.GetPlayers().Where(static p => !p.IsBot && !p.IsHLTV))
+            {
+                LoadCheaterConfig(entry);
+            }
+        }
+
+        private void LoadCheaterConfig(CCSPlayerController player)
+        {
+            if (player == null
+                || !player.IsValid)
+            {
+                return;
+            }
+            string steamid = player.SteamID.ToString();
+            _activeCheaters[player] = Config.Cheater.ContainsKey(steamid)
+                ? Config.Cheater[steamid]
+                : new CheaterConfig();
+            _activeCheaters[player].Name = player.PlayerName;
+        }
+
+        private void SaveCheaterConfigs()
+        {
+            foreach (KeyValuePair<CCSPlayerController, CheaterConfig> kvp in _activeCheaters)
+            {
+                SaveCheaterConfig(kvp.Key);
+            }
+        }
+
+        private void SaveCheaterConfig(CCSPlayerController player)
+        {
+            if (player == null
+                || !player.IsValid)
+            {
+
+                return;
+            }
+            // save cheater config to the config file
+            if (_activeCheaters.TryGetValue(player, out CheaterConfig? config))
+            {
+                Config.Cheater[player.SteamID.ToString()] = config;
+            }
+        }
+
+        private void DeleteCheaterConfig(CCSPlayerController player)
+        {
+            if (player == null
+                || !player.IsValid)
+            {
+                return;
+            }
+            // remove cheater from config
+            _ = Config.Cheater.Remove(player.SteamID.ToString());
         }
     }
 }

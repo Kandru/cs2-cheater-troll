@@ -1,116 +1,106 @@
-﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
+using Microsoft.Extensions.Localization;
 
-namespace CheaterTroll
+namespace CheaterTroll.Plugins
 {
-    public partial class CheaterTroll : BasePlugin, IPluginConfig<PluginConfig>
+    public class GrenadeSelfDamage : PluginBlueprint
     {
-        private bool _GrenadeSelfDamageEnabled = false;
+        public override string Description => "Grenade Self Damage";
+        public override string ClassName => "GrenadeSelfDamage";
+        public override List<string> Events => [
+            "EventHegrenadeDetonate",
+            "EventMolotovDetonate",
+            "EventFlashbangDetonate"
+        ];
 
-        private void InitializeGrenadeSelfDamage()
+        public GrenadeSelfDamage(PluginConfig GlobalConfig, IStringLocalizer Localizer) : base(GlobalConfig, Localizer)
         {
-            if (!Config.GrenadeSelfDamage.Enabled) return;
-            // skip if already enabled
-            if (_GrenadeSelfDamageEnabled) return;
-            // register listener
-            if (Config.GrenadeSelfDamage.EnableHEGrenades) RegisterEventHandler<EventHegrenadeDetonate>(OnHEGrenadeDetonate);
-            if (Config.GrenadeSelfDamage.EnableMolotovs) RegisterEventHandler<EventMolotovDetonate>(OnMolotovDetonate);
-            if (Config.GrenadeSelfDamage.EnableFlashBangs) RegisterEventHandler<EventFlashbangDetonate>(OnFlashBangDetonate);
-            _GrenadeSelfDamageEnabled = true;
-            DebugPrint("Plugin GrenadeSelfDamage enabled");
+            Console.WriteLine(_localizer["plugins.class.initialize"].Value.Replace("{name}", ClassName));
         }
 
-        private void ResetGrenadeSelfDamage()
+        public HookResult EventHegrenadeDetonate(EventHegrenadeDetonate @event, GameEventInfo info)
         {
-            // remove listener
-            DeregisterEventHandler<EventHegrenadeDetonate>(OnHEGrenadeDetonate);
-            DeregisterEventHandler<EventMolotovDetonate>(OnMolotovDetonate);
-            DeregisterEventHandler<EventFlashbangDetonate>(OnFlashBangDetonate);
-            // disable plug-in
-            _GrenadeSelfDamageEnabled = false;
-            DebugPrint("Plugin GrenadeSelfDamage disabled");
-        }
-
-        private HookResult OnHEGrenadeDetonate(EventHegrenadeDetonate @event, GameEventInfo info)
-        {
-            DebugPrint("OnHEGrenadeDetonate");
             CCSPlayerController? player = @event.Userid;
             if (player == null
                 || !player.IsValid
-                || string.IsNullOrEmpty(player.NetworkIDString)
                 || player.IsBot
                 || player.IsHLTV
+                || !_players.ContainsKey(player)
+                || !_players[player].GrenadeSelfDamage.Enabled
+                || !_players[player].GrenadeSelfDamage.EnableHEGrenades
                 || player.PlayerPawn == null
                 || !player.PlayerPawn.IsValid
                 || player.PlayerPawn.Value == null
                 || player.PlayerPawn.Value.AbsOrigin == null
-                || player.PlayerPawn.Value.LifeState != (byte)LifeState_t.LIFE_ALIVE) return HookResult.Continue;
-            // check if player is a cheater
-            if (_onlineCheaters.TryGetValue(player.NetworkIDString, out CheaterConfig? cheaterConfig))
+                || player.PlayerPawn.Value.LifeState != (byte)LifeState_t.LIFE_ALIVE)
             {
-                if (!cheaterConfig.GrenadeSelfDamage.Enabled) return HookResult.Continue;
-                // teleport grenade to player :P
-                CHEGrenadeProjectile? grenade = Utilities.GetEntityFromIndex<CHEGrenadeProjectile>(@event.Entityid);
-                if (grenade == null || !grenade.IsValid) return HookResult.Continue;
-                grenade.Teleport(player.PlayerPawn.Value.AbsOrigin);
-
+                return HookResult.Continue;
             }
+
+            CHEGrenadeProjectile? grenade = Utilities.GetEntityFromIndex<CHEGrenadeProjectile>(@event.Entityid);
+            if (grenade == null || !grenade.IsValid)
+            {
+                return HookResult.Continue;
+            }
+
+            grenade.Teleport(player.PlayerPawn.Value.AbsOrigin);
             return HookResult.Continue;
         }
 
-        private HookResult OnMolotovDetonate(EventMolotovDetonate @event, GameEventInfo info)
+        public HookResult EventMolotovDetonate(EventMolotovDetonate @event, GameEventInfo info)
         {
-            DebugPrint("OnMolotovDetonate");
             CCSPlayerController? player = @event.Userid;
             if (player == null
                 || !player.IsValid
-                || string.IsNullOrEmpty(player.NetworkIDString)
                 || player.IsBot
                 || player.IsHLTV
+                || !_players.ContainsKey(player)
+                || !_players[player].GrenadeSelfDamage.Enabled
+                || !_players[player].GrenadeSelfDamage.EnableMolotovs
                 || player.PlayerPawn == null
                 || !player.PlayerPawn.IsValid
                 || player.PlayerPawn.Value == null
                 || player.PlayerPawn.Value.AbsOrigin == null
-                || player.PlayerPawn.Value.LifeState != (byte)LifeState_t.LIFE_ALIVE) return HookResult.Continue;
-            // check if player is a cheater
-            if (_onlineCheaters.TryGetValue(player.NetworkIDString, out CheaterConfig? cheaterConfig))
+                || player.PlayerPawn.Value.LifeState != (byte)LifeState_t.LIFE_ALIVE)
             {
-                // to avoid further damage to other players teleport player to grenade
-                player.PlayerPawn.Value.Teleport(new Vector(@event.X, @event.Y, @event.Z));
-                // give player only one hp left to die instantl
-                player.PlayerPawn.Value.Health = 1;
+                return HookResult.Continue;
             }
+            // to avoid further damage to other players teleport player to grenade
+            player.PlayerPawn.Value.Teleport(new Vector(@event.X, @event.Y, @event.Z));
+            // give player only one hp left to die instantl
+            player.PlayerPawn.Value.Health = 1;
+            Utilities.SetStateChanged(player.PlayerPawn.Value, "CBaseEntity", "m_iHealth");
             return HookResult.Continue;
         }
 
-        private HookResult OnFlashBangDetonate(EventFlashbangDetonate @event, GameEventInfo info)
+        public HookResult EventFlashbangDetonate(EventFlashbangDetonate @event, GameEventInfo info)
         {
-            DebugPrint("OnFlashBangDetonate");
             CCSPlayerController? player = @event.Userid;
             if (player == null
                 || !player.IsValid
-                || string.IsNullOrEmpty(player.NetworkIDString)
                 || player.IsBot
                 || player.IsHLTV
+                || !_players.ContainsKey(player)
+                || !_players[player].GrenadeSelfDamage.Enabled
+                || !_players[player].GrenadeSelfDamage.EnableFlashBangs
                 || player.PlayerPawn == null
                 || !player.PlayerPawn.IsValid
                 || player.PlayerPawn.Value == null
                 || player.PlayerPawn.Value.AbsOrigin == null
-                || player.PlayerPawn.Value.LifeState != (byte)LifeState_t.LIFE_ALIVE) return HookResult.Continue;
-            // check if player is a cheater
-            if (_onlineCheaters.TryGetValue(player.NetworkIDString, out CheaterConfig? cheaterConfig))
+                || player.PlayerPawn.Value.LifeState != (byte)LifeState_t.LIFE_ALIVE)
             {
-                // simply full-blind the player
-                player.PlayerPawn.Value.FlashDuration = Config.GrenadeSelfDamage.FlashBangDuration;
-                player.PlayerPawn.Value.FlashMaxAlpha = 255;
-                player.PlayerPawn.Value!.BlindStartTime = Server.CurrentTime;
-                player.PlayerPawn.Value.BlindUntilTime = Server.CurrentTime + Config.GrenadeSelfDamage.FlashBangDuration;
-                Utilities.SetStateChanged(player.PlayerPawn.Value, "CCSPlayerPawnBase", "m_flFlashMaxAlpha");
-                Utilities.SetStateChanged(player.PlayerPawn.Value, "CCSPlayerPawnBase", "m_flFlashDuration");
+                return HookResult.Continue;
             }
+            // simply full-blind the player
+            player.PlayerPawn.Value.FlashDuration = _globalConfig.Plugins.GrenadeSelfDamage.FlashBangDuration;
+            player.PlayerPawn.Value.FlashMaxAlpha = 255;
+            player.PlayerPawn.Value.BlindStartTime = Server.CurrentTime;
+            player.PlayerPawn.Value.BlindUntilTime = Server.CurrentTime + _globalConfig.Plugins.GrenadeSelfDamage.FlashBangDuration;
+            Utilities.SetStateChanged(player.PlayerPawn.Value, "CCSPlayerPawnBase", "m_flFlashMaxAlpha");
+            Utilities.SetStateChanged(player.PlayerPawn.Value, "CCSPlayerPawnBase", "m_flFlashDuration");
             return HookResult.Continue;
         }
     }
-
 }
