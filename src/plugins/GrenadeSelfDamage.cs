@@ -15,7 +15,7 @@ namespace CheaterTroll.Plugins
             "EventFlashbangDetonate"
         ];
 
-        public GrenadeSelfDamage(PluginConfig GlobalConfig, IStringLocalizer Localizer) : base(GlobalConfig, Localizer)
+        public GrenadeSelfDamage(PluginConfig GlobalConfig, IStringLocalizer Localizer, bool IshotReloaded) : base(GlobalConfig, Localizer, IshotReloaded)
         {
             Console.WriteLine(_localizer["plugins.class.initialize"].Value.Replace("{name}", ClassName));
         }

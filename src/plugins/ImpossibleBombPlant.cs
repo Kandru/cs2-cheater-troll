@@ -15,7 +15,7 @@ namespace CheaterTroll.Plugins
         ];
         private float _ImpossibleBombPlantLastPlant = 0;
 
-        public ImpossibleBombPlant(PluginConfig GlobalConfig, IStringLocalizer Localizer) : base(GlobalConfig, Localizer)
+        public ImpossibleBombPlant(PluginConfig GlobalConfig, IStringLocalizer Localizer, bool IshotReloaded) : base(GlobalConfig, Localizer, IshotReloaded)
         {
             Console.WriteLine(_localizer["plugins.class.initialize"].Value.Replace("{name}", ClassName));
         }

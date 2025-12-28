@@ -14,17 +14,17 @@ namespace CheaterTroll.Plugins
             "OnTick"
         ];
         public override List<string> Events => [
-            "EventDoorOpen"
+            "EventDoorOpen",
+            "EventBeginNewMatch"
         ];
         private readonly List<long> _doorsInUse = [];
         private readonly Dictionary<CBaseDoor, Vector> _doorPositions = [];
 
-        public DoorGate(PluginConfig GlobalConfig, IStringLocalizer Localizer) : base(GlobalConfig, Localizer)
+        public DoorGate(PluginConfig GlobalConfig, IStringLocalizer Localizer, bool IshotReloaded) : base(GlobalConfig, Localizer, IshotReloaded)
         {
-            // get all door positions from the map and cache them
-            foreach (CBaseDoor entry in Utilities.FindAllEntitiesByDesignerName<CBaseDoor>("prop_door_rotating"))
+            if (IshotReloaded)
             {
-                _doorPositions.Add(entry, entry.AbsOrigin!);
+                GetDoorPositions();
             }
             Console.WriteLine(_localizer["plugins.class.initialize"].Value.Replace("{name}", ClassName));
         }
@@ -115,6 +115,22 @@ namespace CheaterTroll.Plugins
                 _ = door.EmitSound(_globalConfig.Plugins.DoorGate.Sound);
             }
             return HookResult.Continue;
+        }
+
+        public HookResult EventBeginNewMatch(EventBeginNewMatch @event, GameEventInfo info)
+        {
+            GetDoorPositions();
+            return HookResult.Continue;
+        }
+
+        private void GetDoorPositions()
+        {
+            _doorPositions.Clear();
+            // get all door positions from the map and cache them
+            foreach (CBaseDoor entry in Utilities.FindAllEntitiesByDesignerName<CBaseDoor>("prop_door_rotating"))
+            {
+                _doorPositions.Add(entry, entry.AbsOrigin!);
+            }
         }
     }
 }

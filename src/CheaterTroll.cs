@@ -29,7 +29,7 @@ namespace CheaterTroll
             RegisterEventHandler<EventPlayerConnectFull>(OnPlayerConnectFull);
             RegisterEventHandler<EventPlayerDisconnect>(OnPlayerDisconnect);
             // register plugins
-            InitializeModules();
+            InitializeModules(hotReload);
             // check for hot reload
             if (hotReload)
             {
@@ -121,7 +121,7 @@ namespace CheaterTroll
             return HookResult.Continue;
         }
 
-        private void InitializeModules()
+        private void InitializeModules(bool IshotReloaded = false)
         {
             if (_plugins.Count > 0)
             {
@@ -131,31 +131,31 @@ namespace CheaterTroll
             // plug-in invisible enemies
             if (Config.Plugins.InvisibleEnemies.Enabled)
             {
-                _plugins.Add(new InvisibleEnemies(Config, Localizer));
+                _plugins.Add(new InvisibleEnemies(Config, Localizer, IshotReloaded));
             }
 
             // plug-in random player sounds
             if (Config.Plugins.RandomPlayerSounds.Enabled)
             {
-                _plugins.Add(new RandomPlayerSounds(Config, Localizer));
+                _plugins.Add(new RandomPlayerSounds(Config, Localizer, IshotReloaded));
             }
 
             // plug-in grenade self damage
             if (Config.Plugins.GrenadeSelfDamage.Enabled)
             {
-                _plugins.Add(new GrenadeSelfDamage(Config, Localizer));
+                _plugins.Add(new GrenadeSelfDamage(Config, Localizer, IshotReloaded));
             }
 
             // plug-in impossible bomb plant
             if (Config.Plugins.ImpossibleBombPlant.Enabled)
             {
-                _plugins.Add(new ImpossibleBombPlant(Config, Localizer));
+                _plugins.Add(new ImpossibleBombPlant(Config, Localizer, IshotReloaded));
             }
 
             // plug-in door gate
             if (Config.Plugins.DoorGate.Enabled)
             {
-                _plugins.Add(new DoorGate(Config, Localizer));
+                _plugins.Add(new DoorGate(Config, Localizer, IshotReloaded));
             }
 
             // register listeners

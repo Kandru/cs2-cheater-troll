@@ -3,10 +3,11 @@ using Microsoft.Extensions.Localization;
 
 namespace CheaterTroll.Plugins
 {
-    public class PluginBlueprint(PluginConfig GlobalConfig, IStringLocalizer Localizer)
+    public class PluginBlueprint(PluginConfig GlobalConfig, IStringLocalizer Localizer, bool IshotReloaded)
     {
         public readonly PluginConfig _globalConfig = GlobalConfig;
         public readonly IStringLocalizer _localizer = Localizer;
+        public readonly bool _ishotReloaded = IshotReloaded;
         public readonly Dictionary<CCSPlayerController, CheaterConfig> _players = [];
         public virtual string Description { get; private set; } = "PluginBlueprint";
         public virtual string ClassName => "PluginBlueprint";
