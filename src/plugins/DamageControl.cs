@@ -1,11 +1,6 @@
 using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Modules.Utils;
-using CheaterTroll.Enums;
-using CheaterTroll.Utils;
 using Microsoft.Extensions.Localization;
-using CounterStrikeSharp.API.Modules.Entities;
-using System.IO.Compression;
 
 namespace CheaterTroll.Plugins
 {
@@ -49,8 +44,8 @@ namespace CheaterTroll.Plugins
                 return HookResult.Continue;
             }
             // check if attacker is a cheater
-            var attackerController = attackerPawn.Controller.Value.As<CCSPlayerController>();
-            if (!_players.TryGetValue(attackerController, out var playerData))
+            CCSPlayerController attackerController = attackerPawn.Controller.Value.As<CCSPlayerController>();
+            if (!_players.TryGetValue(attackerController, out CheaterConfig? playerData))
             {
                 return HookResult.Continue;
             }
