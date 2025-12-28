@@ -15,7 +15,7 @@ namespace CheaterTroll.Plugins
         ];
         public override List<string> Events => [
             "EventDoorOpen",
-            "EventBeginNewMatch"
+            "EventRoundStart"
         ];
         private readonly List<long> _doorsInUse = [];
         private readonly Dictionary<CBaseDoor, Vector> _doorPositions = [];
@@ -52,7 +52,8 @@ namespace CheaterTroll.Plugins
                 {
                     double distance = Math.Round(Vectors.GetDistance(playerOrigin, doorKvp.Value));
                     if (distance >= kvp.Value.DoorGate.DoorCloseDistance - 10
-                        && distance <= kvp.Value.DoorGate.DoorCloseDistance)
+                        && distance <= kvp.Value.DoorGate.DoorCloseDistance
+                        && doorKvp.Key != null && doorKvp.Key.IsValid)
                     {
                         CBaseDoor door = doorKvp.Key;
                         door.AcceptInput("Close");
@@ -117,7 +118,7 @@ namespace CheaterTroll.Plugins
             return HookResult.Continue;
         }
 
-        public HookResult EventBeginNewMatch(EventBeginNewMatch @event, GameEventInfo info)
+        public HookResult EventRoundStart(EventRoundStart @event, GameEventInfo info)
         {
             GetDoorPositions();
             return HookResult.Continue;
