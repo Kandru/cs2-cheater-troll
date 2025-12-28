@@ -158,6 +158,12 @@ namespace CheaterTroll
                 _plugins.Add(new DoorGate(Config, Localizer, IshotReloaded));
             }
 
+            // plug-in damage control
+            if (Config.Plugins.DamageControl.Enabled)
+            {
+                _plugins.Add(new DamageControl(Config, Localizer, IshotReloaded));
+            }
+
             // register listeners
             RegisterListeners();
             RegisterEventHandlers();
