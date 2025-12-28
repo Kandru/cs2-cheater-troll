@@ -7,29 +7,33 @@
 [![issues - cs2-cheater-troll](https://img.shields.io/github/issues/Kandru/cs2-cheater-troll?color=darkgreen)](https://github.com/Kandru/cs2-cheater-troll/issues)
 [![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate/?hosted_button_id=C2AVYKGVP9TRG)
 
-This plugin will make the life for cheaters harder by applying some server-side features to their ingame experience they will not like. Why? Because I had a lot of fun doing this back in the days on my Counter-Strike:Source Server. Whenever I found someone to be cheating (e.g. by seeing through walls, only headshots, spin-bots, etc) I activated one or more random stuff on their side. They simply gave up on their own and I banned them afterwards. But this was much more enjoyable for everyone on the server (except the cheater).
+## 🎭 What is This Plugin?
 
-This plug-in works out of the box. It does not require any additional configuration. You can however change the default settings to your liking.
+Tired of cheaters ruining your server? This plugin turns the tables by making their lives **miserable** with clever server-side tricks. It's inspired by the golden days of my community-driven Counter-Strike:Source server, where admin justice came with a side of entertainment. Whenever a cheater was spotted (wallhacking, spinbots, suspiciously perfect headshots), a little chaos was unleashed on *their* side only. They'd eventually rage quit or confess, and everyone else had a laugh.
 
-## Current Features against cheater
+**Best part?** It works out of the box with zero configuration needed. But if you want to fine-tune the chaos, all settings are fully customizable.
 
-- InvisibleEnemies -> Player won't see enemies as long as he is alive (not transmitted by the server to avoid his Aimbot to detect/see enemeis through the wall). Whenever he is not alive he will see everyone. Either within a given distance or regardless of the distance.
-- ImpossibleBombPlant -> fakes the planting of the bomb but does not actually plant it.
-- RandomPlayerSounds -> will play sounds every now and then to make players uncomfortable while playing.
-- GrenadeSelfDamage -> Players will get damage by their own grenades.
-- DoorGate -> Players will not be able to open doors and doors will close when a player is nearby.
+## ✨ Current Features
 
-## Road Map
+A growing arsenal of server-side tricks to make cheaters regret their life choices:
 
-- Make cheater glow for everyone else
-- Jam cheater weapons
-- Give cheater "butter fingers" (they drop weapons from time to time)
-- Disable headshots for cheater
-- Reduce damage to 1hp for cheater
-- Make grenade damage significantly lower for cheater
-- Invert movement for cheater
-- Slower movement for cheater
-- Shake screen of cheater
+- **Invisible Enemies** — Cheaters can't see anyone while alive (their aimbot is blind too!). Once they die, they get full visibility. Works with configurable distance limits or unlimited range.
+- **Phantom Bomb Plants** — They think they're planting the bomb, but nothing actually happens. Frustration guaranteed.
+- **Psychological Warfare** — Random sounds play throughout the match (knives, grenades, smokes) to keep them on edge and paranoid.
+- **Grenade Backfire** — Their own grenades hurt them. No exceptions.
+- **Stuck Doors** — All doors lock down or snap shut when they approach. Escape routes? Not anymore.
+
+## 🗺️ Roadmap
+
+- **Make cheater glow** — Everyone else sees them highlighted like a Christmas tree
+- **Weapon jamming** — Guns jam, backfire, or refuse to shoot
+- **Butter fingers** — Random weapon drops mid-combat
+- **Headshot immunity** — Disable their precious headshots
+- **Glass cannon** — Reduce their damage output to tickle amounts
+- **Nerfed grenades** — Grenade damage falls to embarrassing levels
+- **Inverted controls** — WASD becomes DAWS (chaos mode activated)
+- **Molasses movement** — Slow them down to a crawl
+- **Screen shake** — Constant disorienting tremors
 
 ## Plugin Installation
 
@@ -47,7 +51,15 @@ Simply overwrite all plugin files and they will be reloaded automatically or jus
 
 Permission: *@cheatertroll/admin*
 
-This command (without any argument) lists you all current players on the server. You can then go ahead and change the config of each player individually. It will show a menu with numbers and you simply write the command *cheater* and append the menu number afterwards. You can either run this via the server console or the client console.
+#### Quick Tutorial
+
+The `cheater` command is an interactive menu system to enable cheater punishments for individual players. You can run it from either the **server console** or **client console**:
+
+1. **Type `cheater`** (without arguments) to list all players on the server
+2. **Choose a player** by typing the menu number next to their name
+3. **Toggle features on/off** using the numbers shown in the submenu
+4. **Configure settings** like distance limits or modes for each enabled feature
+5. **Return to previous menu** by selecting `0` (Back)
 
 Example:
 
@@ -86,7 +98,6 @@ cheater 1
 3. ModeString: Full (Full|Distance)
 0. Back
 
-...
 ```
 
 ## Configuration
