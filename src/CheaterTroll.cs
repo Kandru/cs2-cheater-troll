@@ -89,6 +89,8 @@ namespace CheaterTroll
             }
             // load cheater config
             LoadCheaterConfig(player);
+            // enable player cheats (if any)
+            EnablePlayerCheats(player);
             return HookResult.Continue;
         }
 
