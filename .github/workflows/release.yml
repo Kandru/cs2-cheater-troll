@@ -120,7 +120,7 @@ jobs:
           jq -r '.[] | .id')
         
         release_ids=($releases)
-        releases_to_delete=${release_ids[@]:5}
+        releases_to_delete=${release_ids[@]:4}
         
         for release_id in $releases_to_delete; do
           curl -X DELETE -H "Authorization: token ${{ secrets.UPLOAD_TOKEN }}" \
