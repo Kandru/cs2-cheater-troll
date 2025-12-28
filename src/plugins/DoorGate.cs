@@ -19,6 +19,7 @@ namespace CheaterTroll.Plugins
         ];
         private readonly List<long> _doorsInUse = [];
         private readonly Dictionary<CBaseDoor, Vector> _doorPositions = [];
+        private readonly Dictionary<(CCSPlayerController, uint), double> _lastDistances = [];
 
         public DoorGate(PluginConfig GlobalConfig, IStringLocalizer Localizer, bool IshotReloaded) : base(GlobalConfig, Localizer, IshotReloaded)
         {
@@ -29,6 +30,14 @@ namespace CheaterTroll.Plugins
             Console.WriteLine(_localizer["plugins.class.initialize"].Value.Replace("{name}", ClassName));
         }
 
+        public override void Reset()
+        {
+            _players.Clear();
+            _doorsInUse.Clear();
+            _doorPositions.Clear();
+            _lastDistances.Clear();
+        }
+
         public void OnTick()
         {
             if (_players.Count == 0
@@ -36,6 +45,7 @@ namespace CheaterTroll.Plugins
             {
                 return;
             }
+            // get all cheaters with doorgate "closenearby" enabled
             foreach (KeyValuePair<CCSPlayerController, CheaterConfig> kvp in _players.Where(static p => p.Value.DoorGate.CloseNearby))
             {
                 CCSPlayerController player = kvp.Key;
@@ -50,13 +60,32 @@ namespace CheaterTroll.Plugins
 
                 foreach (KeyValuePair<CBaseDoor, Vector> doorKvp in _doorPositions)
                 {
-                    double distance = Math.Round(Vectors.GetDistance(playerOrigin, doorKvp.Value));
-                    if (distance >= kvp.Value.DoorGate.DoorCloseDistance - 10
-                        && distance <= kvp.Value.DoorGate.DoorCloseDistance
-                        && doorKvp.Key != null && doorKvp.Key.IsValid)
+                    if (doorKvp.Key == null
+                        || !doorKvp.Key.IsValid)
                     {
-                        CBaseDoor door = doorKvp.Key;
-                        door.AcceptInput("Close");
+                        continue;
+                    }
+                    double currentDistance = Math.Round(Vectors.GetDistance(playerOrigin, doorKvp.Value));
+                    (CCSPlayerController player, uint Index) key = (player, doorKvp.Key.Index);
+
+                    bool gettingCloser = false;
+                    if (_lastDistances.TryGetValue(key, out double lastDistance))
+                    {
+                        gettingCloser = currentDistance < lastDistance;
+                    }
+                    _lastDistances[key] = currentDistance;
+
+                    if (currentDistance >= kvp.Value.DoorGate.DoorCloseDistance - 10
+                        && currentDistance <= kvp.Value.DoorGate.DoorCloseDistance)
+                    {
+                        if (gettingCloser)
+                        {
+                            doorKvp.Key.AcceptInput("Close");
+                        }
+                        else
+                        {
+                            doorKvp.Key.AcceptInput("Open");
+                        }
                     }
                 }
             }
@@ -126,6 +155,8 @@ namespace CheaterTroll.Plugins
 
         private void GetDoorPositions()
         {
+            _doorsInUse.Clear();
+            _lastDistances.Clear();
             _doorPositions.Clear();
             // get all door positions from the map and cache them
             foreach (CBaseDoor entry in Utilities.FindAllEntitiesByDesignerName<CBaseDoor>("prop_door_rotating"))
