@@ -82,12 +82,16 @@ namespace CheaterTroll.Plugins
                 || !player.IsValid
                 || player.PlayerPawn?.Value == null
                 || !player.PlayerPawn.Value.IsValid
-                || !_players.ContainsKey(player)
-                || _glow.ContainsKey(player))
+                || !_players.ContainsKey(player))
             {
                 return HookResult.Continue;
             }
             // add glow again
+            if (_glow.ContainsKey(player))
+            {
+                Glow.RemoveGlow(_glow[player].Item1, _glow[player].Item2);
+                _ = _glow.Remove(player);
+            }
             _glow.Add(player, Glow.Create(player.PlayerPawn.Value, ColorTranslator.FromHtml(_globalConfig.Plugins.PlayerGlow.Color)));
             return HookResult.Continue;
         }
