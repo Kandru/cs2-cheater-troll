@@ -7,13 +7,14 @@
 [![issues - cs2-cheater-troll](https://img.shields.io/github/issues/Kandru/cs2-cheater-troll?color=darkgreen)](https://github.com/Kandru/cs2-cheater-troll/issues)
 [![](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/donate/?hosted_button_id=C2AVYKGVP9TRG)
 
-## 🎭 What is This Plugin?
 
 Tired of cheaters ruining your server? This plugin turns the tables by making their lives **miserable** with clever server-side tricks. It's inspired by the golden days of my community-driven Counter-Strike:Source server, where admin justice came with a side of entertainment. Whenever a cheater was spotted (wallhacking, spinbots, suspiciously perfect headshots), a little chaos was unleashed on *their* side only. They'd eventually rage quit or confess, and everyone else had a laugh.
 
+Special thanks to [ScriptKid](https://www.youtube.com/watch?v=fYYPH4ZUFNo) from whom I got the idea years ago initially. You did something really funny and back then that made me laugh so hard. Now, I've brought this concept into CS2!
+
 **Best part?** It works out of the box with zero configuration needed. But if you want to fine-tune the chaos, all settings are fully customizable.
 
-## ✨ Current Features
+## Current Features
 
 A growing arsenal of server-side tricks to make cheaters regret their life choices:
 
@@ -25,6 +26,9 @@ A growing arsenal of server-side tricks to make cheaters regret their life choic
 - **Make cheater glow** — Everyone else sees them highlighted like a Christmas tree
 - **Impossible Bomb Plant** — They think they're planting the bomb, but nothing actually happens. Frustration guaranteed.
 - **Visible On Radar** - Watch him moving via your radar
+- **Heavy Knife** - walk initially slower with the knife in hand
+- **AnnouncePosition** - the cheater announces his position to other player
+- **CrouchJump** - the cheater is pushed a little bit back when crouching during airtime
 
 ## Plugin Installation
 
@@ -46,11 +50,11 @@ Permission: *@cheatertroll/admin*
 
 The `cheater` command is an interactive menu system to enable cheater punishments for individual players. You can run it from either the **server console** or **client console**:
 
-1. **Type `cheater`** (without arguments) to list all players on the server
+1. **Type `cheater`** (without arguments) to list all players on the server, for actions simply prepend the command with the player index / value to change (e.g., `cheater 1`)
 2. **Choose a player** by typing the menu number next to their name
 3. **Toggle features on/off** using the numbers shown in the submenu
 4. **Configure settings** like distance limits or modes for each enabled feature
-5. **Return to previous menu** by selecting `0` (Back)
+5. **Return to previous menu** by selecting `cheater 0` (Back)
 
 Example command line:
 
@@ -125,6 +129,14 @@ This plugin automatically creates a readable JSON configuration file. This confi
       "speed": 60,
       "delay": 0.1
     },
+    "announce_position": {
+      "enabled": true,
+      "enabled_for_new_cheater": true
+    },
+    "crouch_jump": {
+      "enabled": true,
+      "enabled_for_new_cheater": true
+    },
     "damage_control": {
       "enabled": true,
       "enabled_for_new_cheater": true
@@ -138,6 +150,10 @@ This plugin automatically creates a readable JSON configuration file. This confi
       "enabled": true,
       "enabled_for_new_cheater": false,
       "flashbang_duration": 5
+    },
+    "heavy_knife": {
+      "enabled": true,
+      "enabled_for_new_cheater": true
     },
     "impossible_bomb_plant": {
       "enabled": true,
@@ -191,6 +207,18 @@ This plugin automatically creates a readable JSON configuration file. This confi
   "ConfigVersion": 1
 }
 ```
+
+### global_config
+
+The global config section contains all available options for each module. Each option has its own subsection containing various parameters such as enabling/disabling specific features, setting thresholds, etc.
+
+#### enabled <true/false>
+
+Whether or not this modules is enabled or disabled globally.
+
+#### enabled_for_new_cheater <true/false>
+
+Whether or not a newly marked cheater should have this feature enabled by default. This should be set to `false` unless you want to make it obvious to a new cheater that he is being punished. Per default everything to obvious is disabled.
 
 ## Compile Yourself
 
