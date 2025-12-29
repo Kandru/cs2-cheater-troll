@@ -463,12 +463,19 @@ namespace CheaterTroll
 
         private string GetCheaterName(string steamId)
         {
+            // check currently online players for a name
             foreach (KeyValuePair<CCSPlayerController, Dictionary<PlayerData, string>> p in _connectedPlayers)
             {
                 if (p.Value[PlayerData.STEAM_ID] == steamId)
                 {
                     return p.Value[PlayerData.PLAYER_NAME];
                 }
+            }
+            // check config file for a name
+            if (Config.Cheater.ContainsKey(steamId)
+                && Config.Cheater[steamId].Name != string.Empty)
+            {
+                return Config.Cheater[steamId].Name;
             }
             return steamId;
         }
@@ -485,7 +492,7 @@ namespace CheaterTroll
                 playerName = state.SelectedPlayer?.PlayerName ?? GetCheaterName(steamId);
             }
 
-            _ = menu.AppendLine($"=== Overview -> {playerName} ===");
+            _ = menu.AppendLine($"=== Overview -> {playerName} ({steamId}) ===");
 
             if (isExistingCheater)
             {
@@ -525,7 +532,7 @@ namespace CheaterTroll
 
             string playerName = GetCheaterName(steamId);
             StringBuilder menu = new();
-            _ = menu.AppendLine($"=== Overview -> {playerName} -> {configProperty} ===");
+            _ = menu.AppendLine($"=== Overview -> {playerName} ({steamId}) -> {configProperty} ===");
 
             PropertyInfo enabledProperty = configObject!.GetType().GetProperty("Enabled")!;
             bool isEnabled = (bool)enabledProperty.GetValue(configObject)!;
