@@ -16,19 +16,17 @@ Special thanks to [ScriptKid](https://www.youtube.com/watch?v=fYYPH4ZUFNo) from 
 
 ## Current Features
 
-A growing arsenal of server-side tricks to make cheaters regret their life choices:
-
-- **Invisible Enemies** — Cheaters can't see anyone while alive (their aimbot is blind too!). Once they die, they get full visibility. Works with configurable distance limits or unlimited range.
-- **Phantom Bomb Plants** — They think they're planting the bomb, but nothing actually happens. Frustration guaranteed.
-- **Psychological Warfare** — Random sounds play throughout the match (knives, grenades, smokes) to keep them on edge and paranoid.
-- **Grenade Backfire** — Their own grenades hurt them. No exceptions.
-- **Stuck Doors** — All doors lock down or snap shut when they approach. Escape routes? Not anymore.
-- **Make cheater glow** — Everyone else sees them highlighted like a Christmas tree
-- **Impossible Bomb Plant** — They think they're planting the bomb, but nothing actually happens. Frustration guaranteed.
-- **Visible On Radar** - Watch him moving via your radar
-- **Heavy Knife** - walk initially slower with the knife in hand
-- **AnnouncePosition** - the cheater announces his position to other player
-- **CrouchJump** - the cheater is pushed a little bit back when crouching during airtime
+- **Announce Position** — Cheater announces his position in the chat
+- **Crouch Jump** — Pushed back when crouching mid-air to make crouch-jumps harder
+- **Damage Control** - Cheater is dealing less damage than normal
+- **Door Gate** — Doors lock shut automatically and are not easy to open
+- **Grenade Backfire** — Grenades damage the cheater
+- **Heavy Knife** — Short time slower movement when equipping knife
+- **Impossible Bomb Plant** — Bomb plants fail silently
+- **Invisible Enemies** — Do not transfer enemy player data to the cheater (where there is no data, there is no ability for a wallhack)
+- **Player Glow** — Everybody gets a wallhack to see the cheater
+- **Random Sounds** — Plays random weapon and grenade sounds every now and then
+- **Visible On Radar** — Always visible on minimap
 
 ## Plugin Installation
 
