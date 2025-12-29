@@ -28,12 +28,11 @@ namespace CheaterTroll
             RegisterEventHandler<EventPlayerDisconnect>(OnPlayerDisconnect);
             // register plugins
             InitializeModules(hotReload);
-            // check for players regardless if hot-reloaded or not (if loaded manually during round)
-            UpdatePlayerInfos();
-            EnableAllPlayerCheats();
             // check for hot reload
             if (hotReload)
             {
+                UpdatePlayerInfos();
+                EnableAllPlayerCheats();
                 Console.WriteLine(Localizer["core.hotreload"]);
             }
         }
