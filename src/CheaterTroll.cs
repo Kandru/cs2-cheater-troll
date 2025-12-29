@@ -290,7 +290,9 @@ namespace CheaterTroll
         private void UpdatePlayerInfo(CCSPlayerController player)
         {
             if (player == null
-                || !player.IsValid)
+                || !player.IsValid
+                || player.IsBot
+                || player.IsHLTV)
             {
                 return;
             }
