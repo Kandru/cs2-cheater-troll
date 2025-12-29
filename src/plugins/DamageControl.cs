@@ -68,7 +68,11 @@ namespace CheaterTroll.Plugins
             if (playerData.DamageControl.DamageLimit)
             {
                 info.Damage = Math.Min(info.Damage, playerData.DamageControl.MaxDamage);
+                info.DamageFlags = TakeDamageFlags_t.DFLAG_NONE;
+                info.HitGroupId = HitGroup_t.HITGROUP_GENERIC;
+                info.BitsDamageType = DamageTypes_t.DMG_GENERIC;
             }
+            Console.WriteLine(info.TotalledDamage);
             return HookResult.Continue;
         }
     }
