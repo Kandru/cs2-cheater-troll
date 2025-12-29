@@ -8,6 +8,7 @@ namespace CheaterTroll.Utils
     {
         public MenuLevel CurrentLevel { get; set; } = MenuLevel.Main;
         public CCSPlayerController? SelectedPlayer { get; set; }
+        public string? SelectedPlayerSteamId { get; set; }
         public string? SelectedConfigProperty { get; set; }
         public string? EditingPropertyName { get; set; }
     }

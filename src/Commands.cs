@@ -115,11 +115,12 @@ namespace CheaterTroll
             {
                 state.SelectedConfigProperty = null;
                 state.CurrentLevel = MenuLevel.PlayerConfig;
-                ShowPlayerConfigMenu(command, player, state.SelectedPlayer!);
+                ShowPlayerConfigMenu(command, player, state.SelectedPlayerSteamId!);
             }
             else if (state.CurrentLevel == MenuLevel.PlayerConfig)
             {
                 state.SelectedPlayer = null;
+                state.SelectedPlayerSteamId = null;
                 state.CurrentLevel = MenuLevel.Main;
                 ShowMainMenu(command, player);
             }
@@ -127,51 +128,59 @@ namespace CheaterTroll
 
         private void HandleMainMenuChoice(CommandInfo command, CCSPlayerController? player, PlayerMenuState state, int choice)
         {
-            List<CCSPlayerController> players = [.. _connectedPlayers.Keys];
-            if (choice < 1 || choice > players.Count)
+            List<(string steamId, CCSPlayerController? controller, Dictionary<PlayerData, string>? playerData)> allCheaters = GetAllCheatersForMenu();
+            if (choice < 1 || choice > allCheaters.Count)
             {
-                command.ReplyToCommand($"Invalid choice. Please select between 1 and {players.Count}.");
+                command.ReplyToCommand($"Invalid choice. Please select between 1 and {allCheaters.Count}.");
                 ShowMainMenu(command, player);
                 return;
             }
 
-            state.SelectedPlayer = players[choice - 1];
+            (string steamId, CCSPlayerController? controller, Dictionary<PlayerData, string>? playerData) = allCheaters[choice - 1];
+            state.SelectedPlayer = controller;
+            state.SelectedPlayerSteamId = steamId;
             state.CurrentLevel = MenuLevel.PlayerConfig;
-            ShowPlayerConfigMenu(command, player, state.SelectedPlayer);
+            ShowPlayerConfigMenu(command, player, steamId, playerData);
         }
 
         private void HandlePlayerConfigChoice(CommandInfo command, CCSPlayerController? player, PlayerMenuState state, int choice)
         {
+            string steamId = state.SelectedPlayerSteamId!;
+            
             if (choice == 1)
             {
-                string steamId = state.SelectedPlayer!.SteamID.ToString();
                 bool isExistingCheater = Config.Cheater.ContainsKey(steamId);
 
                 if (isExistingCheater)
                 {
                     _ = Config.Cheater.Remove(steamId);
-                    DeleteCheaterConfig(state.SelectedPlayer);
-                    RemovePlayerCheats(state.SelectedPlayer);
+                    if (state.SelectedPlayer != null)
+                    {
+                        DeleteCheaterConfig(state.SelectedPlayer);
+                        RemovePlayerCheats(state.SelectedPlayer);
+                    }
                     command.ReplyToCommand("✓ Cheater disabled");
                 }
                 else
                 {
                     Config.Cheater.Add(steamId, new CheaterConfig());
-                    EnablePlayerCheats(state.SelectedPlayer);
+                    if (state.SelectedPlayer != null)
+                    {
+                        EnablePlayerCheats(state.SelectedPlayer);
+                    }
                     command.ReplyToCommand("✓ Cheater enabled");
                 }
 
-                ShowPlayerConfigMenu(command, player, state.SelectedPlayer);
+                ShowPlayerConfigMenu(command, player, steamId);
                 return;
             }
 
-            string steamId2 = state.SelectedPlayer!.SteamID.ToString();
-            bool isCheater = Config.Cheater.ContainsKey(steamId2);
+            bool isCheater = Config.Cheater.ContainsKey(steamId);
 
             if (!isCheater)
             {
                 command.ReplyToCommand("Player is not a cheater yet. Enable cheater mode first.");
-                ShowPlayerConfigMenu(command, player, state.SelectedPlayer);
+                ShowPlayerConfigMenu(command, player, steamId);
                 return;
             }
 
@@ -180,18 +189,18 @@ namespace CheaterTroll
             if (choice < 2 || choice > features.Count + 1)
             {
                 command.ReplyToCommand($"Invalid choice.");
-                ShowPlayerConfigMenu(command, player, state.SelectedPlayer);
+                ShowPlayerConfigMenu(command, player, steamId);
                 return;
             }
 
             state.SelectedConfigProperty = features[choice - 2].Name;
             state.CurrentLevel = MenuLevel.ConfigEntry;
-            ShowConfigEntryMenu(command, player, state.SelectedPlayer, state.SelectedConfigProperty);
+            ShowConfigEntryMenu(command, player, steamId, state.SelectedConfigProperty);
         }
 
         private void HandleConfigEntryChoice(CommandInfo command, CCSPlayerController? player, PlayerMenuState state, int choice)
         {
-            string steamId = state.SelectedPlayer!.SteamID.ToString();
+            string steamId = state.SelectedPlayerSteamId!;
             object? configObject = typeof(CheaterConfig).GetProperty(state.SelectedConfigProperty!)!
                 .GetValue(Config.Cheater[steamId]);
 
@@ -200,9 +209,12 @@ namespace CheaterTroll
                 PropertyInfo enabledProperty = configObject!.GetType().GetProperty("Enabled")!;
                 bool isEnabled = (bool)enabledProperty.GetValue(configObject)!;
                 enabledProperty.SetValue(configObject, !isEnabled);
-                EnablePlayerCheats(state.SelectedPlayer!);
+                if (state.SelectedPlayer != null)
+                {
+                    EnablePlayerCheats(state.SelectedPlayer);
+                }
                 command.ReplyToCommand($"✓ {state.SelectedConfigProperty} {(!isEnabled ? "enabled" : "disabled")}");
-                ShowConfigEntryMenu(command, player, state.SelectedPlayer!, state.SelectedConfigProperty!);
+                ShowConfigEntryMenu(command, player, steamId, state.SelectedConfigProperty!);
                 return;
             }
 
@@ -210,7 +222,7 @@ namespace CheaterTroll
             if (!(bool)enabledProp.GetValue(configObject)!)
             {
                 command.ReplyToCommand("This config is disabled. Enable it first.");
-                ShowConfigEntryMenu(command, player, state.SelectedPlayer!, state.SelectedConfigProperty!);
+                ShowConfigEntryMenu(command, player, steamId, state.SelectedConfigProperty!);
                 return;
             }
 
@@ -227,7 +239,7 @@ namespace CheaterTroll
             if (choice < 2 || choice > allProperties.Count + 1)
             {
                 command.ReplyToCommand($"Invalid choice.");
-                ShowConfigEntryMenu(command, player, state.SelectedPlayer!, state.SelectedConfigProperty!);
+                ShowConfigEntryMenu(command, player, steamId, state.SelectedConfigProperty!);
                 return;
             }
 
@@ -237,9 +249,12 @@ namespace CheaterTroll
             {
                 bool value = (bool)selectedProp.GetValue(configObject)!;
                 selectedProp.SetValue(configObject, !value);
-                EnablePlayerCheats(state.SelectedPlayer!);
+                if (state.SelectedPlayer != null)
+                {
+                    EnablePlayerCheats(state.SelectedPlayer);
+                }
                 command.ReplyToCommand($"✓ {selectedProp.Name} {(!value ? "enabled" : "disabled")}");
-                ShowConfigEntryMenu(command, player, state.SelectedPlayer!, state.SelectedConfigProperty!);
+                ShowConfigEntryMenu(command, player, steamId, state.SelectedConfigProperty!);
             }
             else if (IsEnumStringProperty(selectedProp))
             {
@@ -274,14 +289,15 @@ namespace CheaterTroll
 
         private void HandlePropertyEdit(CommandInfo command, CCSPlayerController? player, PlayerMenuState state, string input)
         {
+            string steamId = state.SelectedPlayerSteamId!;
+            
             if (input.Equals("cancel", StringComparison.OrdinalIgnoreCase))
             {
                 state.EditingPropertyName = null;
                 command.ReplyToCommand("✓ Cancelled");
-                ShowConfigEntryMenu(command, player, state.SelectedPlayer!, state.SelectedConfigProperty!);
+                ShowConfigEntryMenu(command, player, steamId, state.SelectedConfigProperty!);
                 return;
             }
-            string steamId = state.SelectedPlayer!.SteamID.ToString();
             object? configObject = typeof(CheaterConfig).GetProperty(state.SelectedConfigProperty!)!
                 .GetValue(Config.Cheater[steamId]);
 
@@ -331,20 +347,23 @@ namespace CheaterTroll
                 {
                     command.ReplyToCommand($"✗ Unsupported property type: {propertyInfo.PropertyType.Name}");
                     state.EditingPropertyName = null;
-                    ShowConfigEntryMenu(command, player, state.SelectedPlayer!, state.SelectedConfigProperty!);
+                    ShowConfigEntryMenu(command, player, steamId, state.SelectedConfigProperty!);
                     return;
                 }
 
-                EnablePlayerCheats(state.SelectedPlayer!);
+                if (state.SelectedPlayer != null)
+                {
+                    EnablePlayerCheats(state.SelectedPlayer);
+                }
                 command.ReplyToCommand($"✓ {state.EditingPropertyName} set to: {propertyInfo.GetValue(configObject)}");
                 state.EditingPropertyName = null;
-                ShowConfigEntryMenu(command, player, state.SelectedPlayer!, state.SelectedConfigProperty!);
+                ShowConfigEntryMenu(command, player, steamId, state.SelectedConfigProperty!);
             }
             catch (Exception ex)
             {
                 command.ReplyToCommand($"✗ Error setting property: {ex.Message}");
                 state.EditingPropertyName = null;
-                ShowConfigEntryMenu(command, player, state.SelectedPlayer!, state.SelectedConfigProperty!);
+                ShowConfigEntryMenu(command, player, steamId, state.SelectedConfigProperty!);
             }
         }
 
@@ -353,13 +372,15 @@ namespace CheaterTroll
             StringBuilder menu = new();
             _ = menu.AppendLine("=== Overview ===");
 
+            List<(string steamId, CCSPlayerController? controller, Dictionary<PlayerData, string>? playerData)> allCheaters = GetAllCheatersForMenu();
             int index = 1;
-            foreach (KeyValuePair<CCSPlayerController, Dictionary<PlayerData, string>> p in _connectedPlayers)
+            foreach ((string steamId, CCSPlayerController? controller, Dictionary<PlayerData, string>? playerData) in allCheaters)
             {
-                string steamId = p.Value[PlayerData.STEAM_ID];
                 bool isCheater = Config.Cheater.ContainsKey(steamId);
                 string status = isCheater ? "✓" : "X";
-                string displayText = FormatPlayerOption(p.Value);
+                string displayText = controller != null && playerData != null 
+                    ? FormatPlayerOption(playerData)
+                    : FormatOfflinePlayerOption(steamId);
                 _ = menu.AppendLine($"{index}. {status} {displayText}");
                 index++;
             }
@@ -374,13 +395,73 @@ namespace CheaterTroll
             }
         }
 
-        private void ShowPlayerConfigMenu(CommandInfo command, CCSPlayerController? player, CCSPlayerController selectedPlayer)
+        private List<(string steamId, CCSPlayerController? controller, Dictionary<PlayerData, string>? playerData)> GetAllCheatersForMenu()
+        {
+            List<(string steamId, CCSPlayerController? controller, Dictionary<PlayerData, string>? playerData)> result = [];
+            List<(string steamId, CCSPlayerController controller, Dictionary<PlayerData, string> playerData, double timeOnline)> onlineCheaters = [];
+            List<(string steamId, string playerName)> offlineCheaters = [];
+
+            foreach (string steamId in Config.Cheater.Keys)
+            {
+                bool isOnline = false;
+                foreach (KeyValuePair<CCSPlayerController, Dictionary<PlayerData, string>> p in _connectedPlayers)
+                {
+                    if (p.Value[PlayerData.STEAM_ID] == steamId)
+                    {
+                        double timeOnline = CalculateTimeOnline(p.Value[PlayerData.TIMESTAMP]);
+                        onlineCheaters.Add((steamId, p.Key, p.Value, timeOnline));
+                        isOnline = true;
+                        break;
+                    }
+                }
+
+                if (!isOnline)
+                {
+                    offlineCheaters.Add((steamId, GetCheaterName(steamId)));
+                }
+            }
+
+            onlineCheaters.Sort((a, b) => a.timeOnline.CompareTo(b.timeOnline));
+            offlineCheaters.Sort((a, b) => a.playerName.CompareTo(b.playerName));
+
+            foreach ((string steamId, CCSPlayerController controller, Dictionary<PlayerData, string> playerData, _) in onlineCheaters)
+            {
+                result.Add((steamId, controller, playerData));
+            }
+
+            foreach ((string steamId, _) in offlineCheaters)
+            {
+                result.Add((steamId, null, null));
+            }
+
+            return result;
+        }
+
+        private string GetCheaterName(string steamId)
+        {
+            foreach (KeyValuePair<CCSPlayerController, Dictionary<PlayerData, string>> p in _connectedPlayers)
+            {
+                if (p.Value[PlayerData.STEAM_ID] == steamId)
+                {
+                    return p.Value[PlayerData.PLAYER_NAME];
+                }
+            }
+            return steamId;
+        }
+
+        private void ShowPlayerConfigMenu(CommandInfo command, CCSPlayerController? player, string steamId, Dictionary<PlayerData, string>? offlinePlayerData = null)
         {
             StringBuilder menu = new();
-            string steamId = selectedPlayer.SteamID.ToString();
             bool isExistingCheater = Config.Cheater.ContainsKey(steamId);
+            string playerName = offlinePlayerData != null ? offlinePlayerData[PlayerData.PLAYER_NAME] : "Unknown";
 
-            _ = menu.AppendLine($"=== Overview -> {selectedPlayer.PlayerName} ===");
+            if (offlinePlayerData == null && player != null)
+            {
+                var state = _clientConsoleMenu.GetPlayerState(player);
+                playerName = state.SelectedPlayer?.PlayerName ?? GetCheaterName(steamId);
+            }
+
+            _ = menu.AppendLine($"=== Overview -> {playerName} ===");
 
             if (isExistingCheater)
             {
@@ -415,14 +496,14 @@ namespace CheaterTroll
             }
         }
 
-        private void ShowConfigEntryMenu(CommandInfo command, CCSPlayerController? player, CCSPlayerController selectedPlayer, string configProperty)
+        private void ShowConfigEntryMenu(CommandInfo command, CCSPlayerController? player, string steamId, string configProperty)
         {
-            string steamId = selectedPlayer.SteamID.ToString();
             object? configObject = typeof(CheaterConfig).GetProperty(configProperty)!
                 .GetValue(Config.Cheater[steamId]);
 
+            string playerName = GetCheaterName(steamId);
             StringBuilder menu = new();
-            _ = menu.AppendLine($"=== Overview -> {selectedPlayer.PlayerName} -> {configProperty} ===");
+            _ = menu.AppendLine($"=== Overview -> {playerName} -> {configProperty} ===");
 
             PropertyInfo enabledProperty = configObject!.GetType().GetProperty("Enabled")!;
             bool isEnabled = (bool)enabledProperty.GetValue(configObject)!;
@@ -504,6 +585,12 @@ namespace CheaterTroll
             double timeOnline = CalculateTimeOnline(playerData[PlayerData.TIMESTAMP]);
 
             return $"{name} ({steamId}, {timeOnline} min online)";
+        }
+
+        private string FormatOfflinePlayerOption(string steamId)
+        {
+            string playerName = GetCheaterName(steamId);
+            return $"{playerName} ({steamId}, offline)";
         }
 
         private double CalculateTimeOnline(string timestamp)
