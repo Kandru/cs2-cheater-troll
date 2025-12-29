@@ -22,7 +22,6 @@ namespace CheaterTroll.Plugins
 
         public override void Add(CCSPlayerController player, CheaterConfig config)
         {
-            ;
             // check if player is valid and has a pawn
             if (player == null
                 || !player.IsValid
@@ -38,8 +37,11 @@ namespace CheaterTroll.Plugins
         public override void Remove(CCSPlayerController player)
         {
             _ = _players.Remove(player);
-            Glow.RemoveGlow(_glow[player].Item1, _glow[player].Item2);
-            _ = _glow.Remove(player);
+            if (_glow.ContainsKey(player))
+            {
+                Glow.RemoveGlow(_glow[player].Item1, _glow[player].Item2);
+                _ = _glow.Remove(player);
+            }
         }
 
         public override void Reset()
