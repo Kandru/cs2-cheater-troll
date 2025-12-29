@@ -424,34 +424,31 @@ namespace CheaterTroll
 
         private List<(string steamId, CCSPlayerController? controller, Dictionary<PlayerData, string>? playerData)> GetAllCheatersForMenu()
         {
-            List<(string steamId, CCSPlayerController controller, Dictionary<PlayerData, string> playerData, double timeOnline)> onlineCheaters = [];
+            List<(string steamId, CCSPlayerController controller, Dictionary<PlayerData, string> playerData, double timeOnline)> connectedPlayers = [];
             List<(string steamId, string playerName)> offlineCheaters = [];
 
-            Dictionary<string, (CCSPlayerController, Dictionary<PlayerData, string>)> onlinePlayersBySteamId = [];
+            HashSet<string> onlineSteamIds = [];
             foreach (KeyValuePair<CCSPlayerController, Dictionary<PlayerData, string>> kvp in _connectedPlayers)
             {
                 string steamId = kvp.Value[PlayerData.STEAM_ID];
-                onlinePlayersBySteamId[steamId] = (kvp.Key, kvp.Value);
+                onlineSteamIds.Add(steamId);
+                double timeOnline = CalculateTimeOnline(kvp.Value[PlayerData.TIMESTAMP]);
+                connectedPlayers.Add((steamId, kvp.Key, kvp.Value, timeOnline));
             }
 
             foreach (string steamId in Config.Cheater.Keys)
             {
-                if (onlinePlayersBySteamId.TryGetValue(steamId, out (CCSPlayerController, Dictionary<PlayerData, string>) playerData))
-                {
-                    double timeOnline = CalculateTimeOnline(playerData.Item2[PlayerData.TIMESTAMP]);
-                    onlineCheaters.Add((steamId, playerData.Item1, playerData.Item2, timeOnline));
-                }
-                else
+                if (!onlineSteamIds.Contains(steamId))
                 {
                     offlineCheaters.Add((steamId, GetCheaterName(steamId)));
                 }
             }
 
-            onlineCheaters.Sort(static (a, b) => a.timeOnline.CompareTo(b.timeOnline));
+            connectedPlayers.Sort(static (a, b) => a.timeOnline.CompareTo(b.timeOnline));
             offlineCheaters.Sort(static (a, b) => a.playerName.CompareTo(b.playerName));
 
             List<(string, CCSPlayerController?, Dictionary<PlayerData, string>?)> result = [];
-            foreach ((string? steamId, CCSPlayerController? controller, Dictionary<PlayerData, string>? playerData, double _) in onlineCheaters)
+            foreach ((string? steamId, CCSPlayerController? controller, Dictionary<PlayerData, string>? playerData, double _) in connectedPlayers)
             {
                 result.Add((steamId, controller, playerData));
             }
