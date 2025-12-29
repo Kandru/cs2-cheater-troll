@@ -218,14 +218,6 @@ namespace CheaterTroll
                 return;
             }
 
-            PropertyInfo enabledProp = configObject!.GetType().GetProperty("Enabled")!;
-            if (!(bool)enabledProp.GetValue(configObject)!)
-            {
-                command.ReplyToCommand("This config is disabled. Enable it first.");
-                ShowConfigEntryMenu(command, player, steamId, state.SelectedConfigProperty!);
-                return;
-            }
-
             List<PropertyInfo> boolProperties = [.. configObject.GetType().GetProperties().Where(static p => p.PropertyType == typeof(bool) && p.Name != "Enabled")];
 
             List<PropertyInfo> floatProperties = [.. configObject.GetType().GetProperties().Where(static p => p.PropertyType == typeof(float))];
@@ -510,54 +502,51 @@ namespace CheaterTroll
 
             _ = menu.AppendLine($"1. {(isEnabled ? "Disable" : "Enable")}");
 
-            if (isEnabled)
+            List<PropertyInfo> boolProperties = [.. configObject.GetType().GetProperties().Where(static p => p.PropertyType == typeof(bool) && p.Name != "Enabled")];
+
+            List<PropertyInfo> floatProperties = [.. configObject.GetType().GetProperties().Where(static p => p.PropertyType == typeof(float))];
+
+            List<PropertyInfo> intProperties = [.. configObject.GetType().GetProperties().Where(static p => p.PropertyType == typeof(int))];
+
+            List<PropertyInfo> stringProperties = [.. configObject.GetType().GetProperties().Where(static p => p.PropertyType == typeof(string))];
+
+            int index = 2;
+            foreach (PropertyInfo? prop in boolProperties)
             {
-                List<PropertyInfo> boolProperties = [.. configObject.GetType().GetProperties().Where(static p => p.PropertyType == typeof(bool) && p.Name != "Enabled")];
+                bool value = (bool)prop.GetValue(configObject)!;
+                string status = value ? "✓" : "X";
+                _ = menu.AppendLine($"{index}. {status} {prop.Name}");
+                index++;
+            }
 
-                List<PropertyInfo> floatProperties = [.. configObject.GetType().GetProperties().Where(static p => p.PropertyType == typeof(float))];
+            foreach (PropertyInfo? prop in floatProperties)
+            {
+                float value = (float)prop.GetValue(configObject)!;
+                _ = menu.AppendLine($"{index}. {prop.Name}: {value}");
+                index++;
+            }
 
-                List<PropertyInfo> intProperties = [.. configObject.GetType().GetProperties().Where(static p => p.PropertyType == typeof(int))];
+            foreach (PropertyInfo? prop in intProperties)
+            {
+                int value = (int)prop.GetValue(configObject)!;
+                _ = menu.AppendLine($"{index}. {prop.Name}: {value}");
+                index++;
+            }
 
-                List<PropertyInfo> stringProperties = [.. configObject.GetType().GetProperties().Where(static p => p.PropertyType == typeof(string))];
+            foreach (PropertyInfo? prop in stringProperties)
+            {
+                string value = (string?)prop.GetValue(configObject) ?? "null";
+                string displayValue = value;
 
-                int index = 2;
-                foreach (PropertyInfo? prop in boolProperties)
+                if (IsEnumStringProperty(prop))
                 {
-                    bool value = (bool)prop.GetValue(configObject)!;
-                    string status = value ? "✓" : "X";
-                    _ = menu.AppendLine($"{index}. {status} {prop.Name}");
-                    index++;
+                    Type? enumType = GetEnumTypeForStringProperty(prop);
+                    string enumValues = string.Join("|", Enum.GetNames(enumType!));
+                    displayValue = $"{value} ({enumValues})";
                 }
 
-                foreach (PropertyInfo? prop in floatProperties)
-                {
-                    float value = (float)prop.GetValue(configObject)!;
-                    _ = menu.AppendLine($"{index}. {prop.Name}: {value}");
-                    index++;
-                }
-
-                foreach (PropertyInfo? prop in intProperties)
-                {
-                    int value = (int)prop.GetValue(configObject)!;
-                    _ = menu.AppendLine($"{index}. {prop.Name}: {value}");
-                    index++;
-                }
-
-                foreach (PropertyInfo? prop in stringProperties)
-                {
-                    string value = (string?)prop.GetValue(configObject) ?? "null";
-                    string displayValue = value;
-
-                    if (IsEnumStringProperty(prop))
-                    {
-                        Type? enumType = GetEnumTypeForStringProperty(prop);
-                        string enumValues = string.Join("|", Enum.GetNames(enumType!));
-                        displayValue = $"{value} ({enumValues})";
-                    }
-
-                    _ = menu.AppendLine($"{index}. {prop.Name}: {displayValue}");
-                    index++;
-                }
+                _ = menu.AppendLine($"{index}. {prop.Name}: {displayValue}");
+                index++;
             }
 
             _ = menu.AppendLine("0. Back");
