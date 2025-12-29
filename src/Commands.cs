@@ -431,7 +431,7 @@ namespace CheaterTroll
             foreach (KeyValuePair<CCSPlayerController, Dictionary<PlayerData, string>> kvp in _connectedPlayers)
             {
                 string steamId = kvp.Value[PlayerData.STEAM_ID];
-                onlineSteamIds.Add(steamId);
+                _ = onlineSteamIds.Add(steamId);
                 double timeOnline = CalculateTimeOnline(kvp.Value[PlayerData.TIMESTAMP]);
                 connectedPlayers.Add((steamId, kvp.Key, kvp.Value, timeOnline));
             }
@@ -448,12 +448,12 @@ namespace CheaterTroll
             offlineCheaters.Sort(static (a, b) => a.playerName.CompareTo(b.playerName));
 
             List<(string, CCSPlayerController?, Dictionary<PlayerData, string>?)> result = [];
-            foreach ((string? steamId, CCSPlayerController? controller, Dictionary<PlayerData, string>? playerData, double _) in connectedPlayers)
+            foreach ((string? steamId, CCSPlayerController? controller, Dictionary<PlayerData, string>? playerData, _) in connectedPlayers)
             {
                 result.Add((steamId, controller, playerData));
             }
 
-            foreach ((string? steamId, string _) in offlineCheaters)
+            foreach ((string? steamId, _) in offlineCheaters)
             {
                 result.Add((steamId, null, null));
             }
@@ -472,12 +472,10 @@ namespace CheaterTroll
                 }
             }
             // check config file for a name
-            if (Config.Cheater.ContainsKey(steamId)
-                && Config.Cheater[steamId].Name != string.Empty)
-            {
-                return Config.Cheater[steamId].Name;
-            }
-            return steamId;
+            return Config.Cheater.ContainsKey(steamId)
+                && Config.Cheater[steamId].Name != string.Empty
+                ? Config.Cheater[steamId].Name
+                : steamId;
         }
 
         private void ShowPlayerConfigMenu(CommandInfo command, CCSPlayerController? player, string steamId, Dictionary<PlayerData, string>? offlinePlayerData = null)
