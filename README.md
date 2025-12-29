@@ -22,10 +22,11 @@ A growing arsenal of server-side tricks to make cheaters regret their life choic
 - **Psychological Warfare** — Random sounds play throughout the match (knives, grenades, smokes) to keep them on edge and paranoid.
 - **Grenade Backfire** — Their own grenades hurt them. No exceptions.
 - **Stuck Doors** — All doors lock down or snap shut when they approach. Escape routes? Not anymore.
+- **Make cheater glow** — Everyone else sees them highlighted like a Christmas tree
+- **Impossible Bomb Plant** — They think they're planting the bomb, but nothing actually happens. Frustration guaranteed.
 
 ## 🗺️ Roadmap
 
-- **Make cheater glow** — Everyone else sees them highlighted like a Christmas tree
 - **Weapon jamming** — Guns jam, backfire, or refuse to shoot
 - **Butter fingers** — Random weapon drops mid-combat
 - **Glass cannon** — Reduce their damage output to tickle amounts
