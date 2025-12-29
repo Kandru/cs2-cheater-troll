@@ -34,7 +34,6 @@ namespace CheaterTroll.Plugins
             {
                 return HookResult.Continue;
             }
-            Console.WriteLine($"Weapon selected: {@event.Item}");
             SetPlayerSpeed(player);
             return HookResult.Continue;
         }
