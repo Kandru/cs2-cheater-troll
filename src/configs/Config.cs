@@ -1,5 +1,4 @@
-﻿using CounterStrikeSharp.API;
-using CounterStrikeSharp.API.Core;
+﻿using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Extensions;
 using System.Text.Json.Serialization;
 
@@ -10,6 +9,7 @@ namespace CheaterTroll
         [JsonPropertyName("name")] public string Name { get; set; } = string.Empty;
         [JsonPropertyName("always_door_closed")] public DoorGatePlayerConfig DoorGate { get; set; } = new DoorGatePlayerConfig();
         [JsonPropertyName("damage_control")] public DamageControlPlayerConfig DamageControl { get; set; } = new DamageControlPlayerConfig();
+        [JsonPropertyName("glow")] public PlayerGlowPlayerConfig PlayerGlow { get; set; } = new PlayerGlowPlayerConfig();
         [JsonPropertyName("grenade_self_damage")] public GrenadeSelfDamagePlayerConfig GrenadeSelfDamage { get; set; } = new GrenadeSelfDamagePlayerConfig();
         [JsonPropertyName("impossible_bomb_plant")] public ImpossibleBombPlantPlayerConfig ImpossibleBombPlant { get; set; } = new ImpossibleBombPlantPlayerConfig();
         [JsonPropertyName("invisible_enemies")] public InvisibleEnemiesPlayerConfig InvisibleEnemies { get; set; } = new InvisibleEnemiesPlayerConfig();
@@ -20,6 +20,7 @@ namespace CheaterTroll
     {
         [JsonPropertyName("always_door_closed")] public DoorGateConfig DoorGate { get; set; } = new DoorGateConfig();
         [JsonPropertyName("damage_control")] public DamageControlConfig DamageControl { get; set; } = new DamageControlConfig();
+        [JsonPropertyName("glow")] public PlayerGlowConfig PlayerGlow { get; set; } = new PlayerGlowConfig();
         [JsonPropertyName("grenade_self_damage")] public GrenadeSelfDamageConfig GrenadeSelfDamage { get; set; } = new GrenadeSelfDamageConfig();
         [JsonPropertyName("impossible_bomb_plant")] public ImpossibleBombPlantConfig ImpossibleBombPlant { get; set; } = new ImpossibleBombPlantConfig();
         [JsonPropertyName("invisible_enemies")] public InvisibleEnemiesConfig InvisibleEnemies { get; set; } = new InvisibleEnemiesConfig();

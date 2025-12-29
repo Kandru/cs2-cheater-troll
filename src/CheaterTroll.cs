@@ -151,6 +151,12 @@ namespace CheaterTroll
                 _plugins.Add(new DamageControl(Config, Localizer, IshotReloaded));
             }
 
+            // plug-in Glow
+            if (Config.Plugins.PlayerGlow.Enabled)
+            {
+                _plugins.Add(new PlayerGlow(Config, Localizer, IshotReloaded));
+            }
+
             // register listeners
             RegisterListeners();
             RegisterEventHandlers();
