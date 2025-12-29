@@ -1,0 +1,18 @@
+using System.Text.Json.Serialization;
+
+namespace CheaterTroll
+{
+    public class CrouchJumpConfig
+    {
+        // enable or disable globally (load plug-in or not)
+        [JsonPropertyName("enabled")] public bool Enabled { get; set; } = true;
+        // enable or disable for a new cheater by default
+        [JsonPropertyName("enabled_for_new_cheater")] public bool DefaultEnabled { get; set; } = true;
+    }
+
+    public class CrouchJumpPlayerConfig
+    {
+        // enabled
+        [JsonPropertyName("enabled")] public bool Enabled { get; set; } = true;
+    }
+}

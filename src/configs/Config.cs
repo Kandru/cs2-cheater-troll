@@ -9,6 +9,7 @@ namespace CheaterTroll
         [JsonPropertyName("name")] public string Name { get; set; } = string.Empty;
         [JsonPropertyName("always_door_closed")] public DoorGatePlayerConfig DoorGate { get; set; } = new DoorGatePlayerConfig();
         [JsonPropertyName("announce_pisition")] public AnnouncePositionPlayerConfig AnnouncePosition { get; set; } = new AnnouncePositionPlayerConfig();
+        [JsonPropertyName("crouch_jump")] public CrouchJumpPlayerConfig CrouchJump { get; set; } = new CrouchJumpPlayerConfig();
         [JsonPropertyName("damage_control")] public DamageControlPlayerConfig DamageControl { get; set; } = new DamageControlPlayerConfig();
         [JsonPropertyName("glow")] public PlayerGlowPlayerConfig PlayerGlow { get; set; } = new PlayerGlowPlayerConfig();
         [JsonPropertyName("grenade_self_damage")] public GrenadeSelfDamagePlayerConfig GrenadeSelfDamage { get; set; } = new GrenadeSelfDamagePlayerConfig();
@@ -23,6 +24,7 @@ namespace CheaterTroll
     {
         [JsonPropertyName("always_door_closed")] public DoorGateConfig DoorGate { get; set; } = new DoorGateConfig();
         [JsonPropertyName("announce_position")] public AnnouncePositionConfig AnnouncePosition { get; set; } = new AnnouncePositionConfig();
+        [JsonPropertyName("crouch_jump")] public CrouchJumpConfig CrouchJump { get; set; } = new CrouchJumpConfig();
         [JsonPropertyName("damage_control")] public DamageControlConfig DamageControl { get; set; } = new DamageControlConfig();
         [JsonPropertyName("glow")] public PlayerGlowConfig PlayerGlow { get; set; } = new PlayerGlowConfig();
         [JsonPropertyName("grenade_self_damage")] public GrenadeSelfDamageConfig GrenadeSelfDamage { get; set; } = new GrenadeSelfDamageConfig();

@@ -175,6 +175,12 @@ namespace CheaterTroll
                 _plugins.Add(new AnnouncePosition(Config, Localizer, IshotReloaded));
             }
 
+            // plug-in crouch jump
+            if (Config.Plugins.CrouchJump.Enabled)
+            {
+                _plugins.Add(new CrouchJump(Config, Localizer, IshotReloaded));
+            }
+
             // register listeners
             RegisterListeners();
             RegisterEventHandlers();
