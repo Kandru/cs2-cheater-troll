@@ -64,7 +64,9 @@ namespace CheaterTroll.Plugins
                 return;
             }
             // only proceed if player pressed both Duck and Jump and was not already forced forward
-            if (!((player.Buttons & PlayerButtons.Duck) != 0 && (player.Buttons & PlayerButtons.Jump) != 0)
+            if (!((player.Buttons & PlayerButtons.Duck) != 0
+                && (player.Buttons & PlayerButtons.Jump) != 0
+                && (player.Buttons & PlayerButtons.Forward) != 0)
                 || _playerWasForcedBackwards[player])
             {
                 return;
