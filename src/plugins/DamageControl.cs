@@ -9,7 +9,6 @@ namespace CheaterTroll.Plugins
         public override string Description => "Damage Control";
         public override string ClassName => "DamageControl";
         public override List<string> Listeners => [
-            "CheckTransmit",
             "OnEntityTakeDamagePre"
         ];
 
