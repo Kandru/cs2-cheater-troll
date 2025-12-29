@@ -24,16 +24,7 @@ A growing arsenal of server-side tricks to make cheaters regret their life choic
 - **Stuck Doors** — All doors lock down or snap shut when they approach. Escape routes? Not anymore.
 - **Make cheater glow** — Everyone else sees them highlighted like a Christmas tree
 - **Impossible Bomb Plant** — They think they're planting the bomb, but nothing actually happens. Frustration guaranteed.
-
-## 🗺️ Roadmap
-
-- **Weapon jamming** — Guns jam, backfire, or refuse to shoot
-- **Butter fingers** — Random weapon drops mid-combat
-- **Glass cannon** — Reduce their damage output to tickle amounts
-- **Nerfed grenades** — Grenade damage falls to embarrassing levels
-- **Inverted controls** — WASD becomes DAWS (chaos mode activated)
-- **Molasses movement** — Slow them down to a crawl
-- **Screen shake** — Constant disorienting tremors
+- **Visible On Radar** - Watch him moving via your radar
 
 ## Plugin Installation
 

@@ -14,6 +14,7 @@ namespace CheaterTroll
         [JsonPropertyName("impossible_bomb_plant")] public ImpossibleBombPlantPlayerConfig ImpossibleBombPlant { get; set; } = new ImpossibleBombPlantPlayerConfig();
         [JsonPropertyName("invisible_enemies")] public InvisibleEnemiesPlayerConfig InvisibleEnemies { get; set; } = new InvisibleEnemiesPlayerConfig();
         [JsonPropertyName("random_player_sounds")] public RandomPlayerSoundsPlayerConfig RandomPlayerSounds { get; set; } = new RandomPlayerSoundsPlayerConfig();
+        [JsonPropertyName("visible_on_radar")] public VisibleOnRadarPlayerConfig VisibleOnRadar { get; set; } = new VisibleOnRadarPlayerConfig();
     }
 
     public class PluginsConfig
@@ -25,6 +26,7 @@ namespace CheaterTroll
         [JsonPropertyName("impossible_bomb_plant")] public ImpossibleBombPlantConfig ImpossibleBombPlant { get; set; } = new ImpossibleBombPlantConfig();
         [JsonPropertyName("invisible_enemies")] public InvisibleEnemiesConfig InvisibleEnemies { get; set; } = new InvisibleEnemiesConfig();
         [JsonPropertyName("random_player_sounds")] public RandomPlayerSoundsConfig RandomPlayerSounds { get; set; } = new RandomPlayerSoundsConfig();
+        [JsonPropertyName("visible_on_radar")] public VisibleOnRadarConfig VisibleOnRadar { get; set; } = new VisibleOnRadarConfig();
     }
 
     public class PluginConfig : BasePluginConfig

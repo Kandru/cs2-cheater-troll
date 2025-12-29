@@ -157,6 +157,12 @@ namespace CheaterTroll
                 _plugins.Add(new PlayerGlow(Config, Localizer, IshotReloaded));
             }
 
+            // plug-in visible on radar
+            if (Config.Plugins.VisibleOnRadar.Enabled)
+            {
+                _plugins.Add(new VisibleOnRadar(Config, Localizer, IshotReloaded));
+            }
+
             // register listeners
             RegisterListeners();
             RegisterEventHandlers();
