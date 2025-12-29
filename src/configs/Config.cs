@@ -11,6 +11,7 @@ namespace CheaterTroll
         [JsonPropertyName("damage_control")] public DamageControlPlayerConfig DamageControl { get; set; } = new DamageControlPlayerConfig();
         [JsonPropertyName("glow")] public PlayerGlowPlayerConfig PlayerGlow { get; set; } = new PlayerGlowPlayerConfig();
         [JsonPropertyName("grenade_self_damage")] public GrenadeSelfDamagePlayerConfig GrenadeSelfDamage { get; set; } = new GrenadeSelfDamagePlayerConfig();
+        [JsonPropertyName("heavy_knife")] public HeavyKnifePlayerConfig HeavyKnife { get; set; } = new HeavyKnifePlayerConfig();
         [JsonPropertyName("impossible_bomb_plant")] public ImpossibleBombPlantPlayerConfig ImpossibleBombPlant { get; set; } = new ImpossibleBombPlantPlayerConfig();
         [JsonPropertyName("invisible_enemies")] public InvisibleEnemiesPlayerConfig InvisibleEnemies { get; set; } = new InvisibleEnemiesPlayerConfig();
         [JsonPropertyName("random_player_sounds")] public RandomPlayerSoundsPlayerConfig RandomPlayerSounds { get; set; } = new RandomPlayerSoundsPlayerConfig();
@@ -23,6 +24,7 @@ namespace CheaterTroll
         [JsonPropertyName("damage_control")] public DamageControlConfig DamageControl { get; set; } = new DamageControlConfig();
         [JsonPropertyName("glow")] public PlayerGlowConfig PlayerGlow { get; set; } = new PlayerGlowConfig();
         [JsonPropertyName("grenade_self_damage")] public GrenadeSelfDamageConfig GrenadeSelfDamage { get; set; } = new GrenadeSelfDamageConfig();
+        [JsonPropertyName("heavy_knife")] public HeavyKnifeConfig HeavyKnife { get; set; } = new HeavyKnifeConfig();
         [JsonPropertyName("impossible_bomb_plant")] public ImpossibleBombPlantConfig ImpossibleBombPlant { get; set; } = new ImpossibleBombPlantConfig();
         [JsonPropertyName("invisible_enemies")] public InvisibleEnemiesConfig InvisibleEnemies { get; set; } = new InvisibleEnemiesConfig();
         [JsonPropertyName("random_player_sounds")] public RandomPlayerSoundsConfig RandomPlayerSounds { get; set; } = new RandomPlayerSoundsConfig();
