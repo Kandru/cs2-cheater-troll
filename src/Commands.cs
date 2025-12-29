@@ -143,6 +143,8 @@ namespace CheaterTroll
                 case MenuLevel.ConfigEntry:
                     HandleConfigEntryChoice(command, player, state, choice);
                     break;
+                default:
+                    break;
             }
         }
 
