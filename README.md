@@ -52,43 +52,61 @@ The `cheater` command is an interactive menu system to enable cheater punishment
 4. **Configure settings** like distance limits or modes for each enabled feature
 5. **Return to previous menu** by selecting `0` (Back)
 
-Example:
+Example command line:
 
-```
-cheater
-=== Overview ===
-1. X kalle (7656XXXXXXXXXXXXXX, 2.26 min online)
-0. Exit
-
-cheater 1
-=== Overview -> kalle ===
-1. Enable Cheater
-0. Back
-
-cheater 1
-✓ Cheater enabled
-=== Overview -> kalle ===
-1. Disable Cheater
-2. X InvisibleEnemies
-3. X GrenadeSelfDamage
-4. X ImpossibleBombPlant
-5. X RandomPlayerSounds
-6. ✓ DoorGate
-0. Back
-
-cheater 2
-=== Overview -> kalle -> InvisibleEnemies ===
-1. Enable
-0. Back
-
-cheater 1
-✓ InvisibleEnemies enabled
-=== Overview -> kalle -> InvisibleEnemies ===
-1. Disable
-2. Distance: 750
-3. ModeString: Full (Full|Distance)
-0. Back
-
+```c
+> cheater
+[Client] === Overview ===
+[Client] 1. X kalle (765611XXXXXXXXXXX, 0.26 min online)
+[Client] 0. Exit
+> 
+> cheater 1
+[Client] === Overview -> kalle (765611XXXXXXXXXXX) ===
+[Client] 1. Enable Cheater
+[Client] 0. Back
+> 
+> cheater 1
+[Client] ✓ Cheater enabled
+[Client] === Overview -> kalle (765611XXXXXXXXXXX) ===
+[Client] 1. Disable Cheater
+[Client] 2. ✓ DoorGate
+[Client] 3. ✓ DamageControl
+[Client] 4. X PlayerGlow
+[Client] 5. X GrenadeSelfDamage
+[Client] 6. ✓ ImpossibleBombPlant
+[Client] 7. X InvisibleEnemies
+[Client] 8. X RandomPlayerSounds
+[Client] 9. X VisibleOnRadar
+[Client] 0. Back
+> 
+> cheater 4
+[Client] === Overview -> kalle (765611XXXXXXXXXXX) -> PlayerGlow ===
+[Client] 1. Enable
+[Client] 0. Back
+> 
+> cheater 1
+[Client] ✓ PlayerGlow enabled
+[Client] === Overview -> kalle (765611XXXXXXXXXXX) -> PlayerGlow ===
+[Client] 1. Disable
+[Client] 0. Back
+> 
+> cheater 0
+[Client] === Overview -> kalle (765611XXXXXXXXXXX) ===
+[Client] 1. Disable Cheater
+[Client] 2. ✓ DoorGate
+[Client] 3. ✓ DamageControl
+[Client] 4. ✓ PlayerGlow
+[Client] 5. X GrenadeSelfDamage
+[Client] 6. ✓ ImpossibleBombPlant
+[Client] 7. X InvisibleEnemies
+[Client] 8. X RandomPlayerSounds
+[Client] 9. X VisibleOnRadar
+[Client] 0. Back
+> 
+> cheater 0
+[Client] === Overview ===
+[Client] 1. ✓ kalle (765611XXXXXXXXXXX, 0.77 min online)
+[Client] 0. Exit
 ```
 
 ## Configuration
@@ -100,20 +118,39 @@ This plugin automatically creates a readable JSON configuration file. This confi
   "enabled": true,
   "debug": false,
   "global_config": {
-    "name": "",
-    "invisible_enemies": {
+    "always_door_closed": {
       "enabled": true,
-      "mode": "Full"
+      "enabled_for_new_cheater": true,
+      "sound": "Saysound.Knock",
+      "speed": 60,
+      "delay": 0.1
+    },
+    "damage_control": {
+      "enabled": true,
+      "enabled_for_new_cheater": true
+    },
+    "glow": {
+      "enabled": true,
+      "enabled_for_new_cheater": false,
+      "color": "#ff00a2"
     },
     "grenade_self_damage": {
       "enabled": true,
+      "enabled_for_new_cheater": false,
       "flashbang_duration": 5
     },
     "impossible_bomb_plant": {
-      "enabled": true
+      "enabled": true,
+      "enabled_for_new_cheater": true
+    },
+    "invisible_enemies": {
+      "enabled": true,
+      "enabled_for_new_cheater": false,
+      "mode": "Full"
     },
     "random_player_sounds": {
       "enabled": true,
+      "enabled_for_new_cheater": false,
       "sounds": [
         {
           "name": "Weapon_Knife.Deploy",
@@ -142,14 +179,12 @@ This plugin automatically creates a readable JSON configuration file. This confi
         }
       ],
       "wait_time": 5,
-      "min_time": 20,
-      "max_time": 60
+      "min_time": 5,
+      "max_time": 30
     },
-    "always_door_closed": {
+    "visible_on_radar": {
       "enabled": true,
-      "sound": "Saysound.Knock",
-      "speed": 60,
-      "delay": 0.1
+      "enabled_for_new_cheater": false
     }
   },
   "cheater": {},
