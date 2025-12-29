@@ -169,6 +169,12 @@ namespace CheaterTroll
                 _plugins.Add(new HeavyKnife(Config, Localizer, IshotReloaded));
             }
 
+            // plug-in announce position
+            if (Config.Plugins.AnnouncePosition.Enabled)
+            {
+                _plugins.Add(new AnnouncePosition(Config, Localizer, IshotReloaded));
+            }
+
             // register listeners
             RegisterListeners();
             RegisterEventHandlers();

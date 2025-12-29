@@ -10,5 +10,19 @@
     "command.toomanyplayers": "[CheaterTroll] {default}Too many players found.",
     "command.addedplayer": "[CheaterTroll] {default}Added {green}{player}{default}.",
     "command.removedplayer": "[CheaterTroll] {default}Removed {green}{player}{default}.",
-    "plugins.class.initialize": "[CheaterTroll] {name} initialized!"
+    "plugins.class.initialize": "[CheaterTroll] {name} initialized!",
+    "heavyknife.chat.position.1": "met me at {name}",
+    "heavyknife.chat.position.2": "kill me at {name}",
+    "heavyknife.chat.position.3": "i'm positioned at {name}",
+    "heavyknife.chat.position.4": "rush to {name}, I'm there",
+    "heavyknife.chat.position.5": "waiting at {name}",
+    "heavyknife.chat.position.6": "send help, I'm at {name}",
+    "heavyknife.chat.position.7": "i'm vibing at {name}",
+    "heavyknife.chat.position.8": "found the cheese at {name}",
+    "heavyknife.chat.position.9": "banana split at {name}, join me",
+    "heavyknife.chat.position.10": "plot twist: I'm actually at {name}",
+    "heavyknife.chat.position.11": "send backup, I'm stuck at {name}",
+    "heavyknife.chat.position.12": "found the secret stash at {name}",
+    "heavyknife.chat.position.13": "literally lost at {name}, send coordinates",
+    "heavyknife.chat.position.14": "spawned into existence at {name}, catch me!"
 }

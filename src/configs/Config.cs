@@ -8,6 +8,7 @@ namespace CheaterTroll
     {
         [JsonPropertyName("name")] public string Name { get; set; } = string.Empty;
         [JsonPropertyName("always_door_closed")] public DoorGatePlayerConfig DoorGate { get; set; } = new DoorGatePlayerConfig();
+        [JsonPropertyName("announce_pisition")] public AnnouncePositionPlayerConfig AnnouncePosition { get; set; } = new AnnouncePositionPlayerConfig();
         [JsonPropertyName("damage_control")] public DamageControlPlayerConfig DamageControl { get; set; } = new DamageControlPlayerConfig();
         [JsonPropertyName("glow")] public PlayerGlowPlayerConfig PlayerGlow { get; set; } = new PlayerGlowPlayerConfig();
         [JsonPropertyName("grenade_self_damage")] public GrenadeSelfDamagePlayerConfig GrenadeSelfDamage { get; set; } = new GrenadeSelfDamagePlayerConfig();
@@ -21,6 +22,7 @@ namespace CheaterTroll
     public class PluginsConfig
     {
         [JsonPropertyName("always_door_closed")] public DoorGateConfig DoorGate { get; set; } = new DoorGateConfig();
+        [JsonPropertyName("announce_position")] public AnnouncePositionConfig AnnouncePosition { get; set; } = new AnnouncePositionConfig();
         [JsonPropertyName("damage_control")] public DamageControlConfig DamageControl { get; set; } = new DamageControlConfig();
         [JsonPropertyName("glow")] public PlayerGlowConfig PlayerGlow { get; set; } = new PlayerGlowConfig();
         [JsonPropertyName("grenade_self_damage")] public GrenadeSelfDamageConfig GrenadeSelfDamage { get; set; } = new GrenadeSelfDamageConfig();
@@ -85,11 +87,7 @@ namespace CheaterTroll
         private bool CheckIfCheater(CCSPlayerController player)
         {
             string steamId = player.SteamID.ToString();
-            if (Config.Cheater.ContainsKey(steamId))
-            {
-                return true;
-            }
-            return false;
+            return Config.Cheater.ContainsKey(steamId);
         }
     }
 }

@@ -10,5 +10,19 @@
     "command.toomanyplayers": "[CheaterTroll] {default}Zu viele Spieler gefunden.",
     "command.addedplayer": "[CheaterTroll] {default}Spieler {green}{player}{default} hinzugefügt.",
     "command.removedplayer": "[CheaterTroll] {default}Spieler {green}{player}{default} entfernt.",
-    "plugins.class.initialize": "[CheaterTroll] {default}Plugin {green}{name} {default}initialisiert."
+    "plugins.class.initialize": "[CheaterTroll] {default}Plugin {green}{name} {default}initialisiert.",
+    "heavyknife.chat.position.1": "triff mich beim{name}",
+    "heavyknife.chat.position.2": "töte mich beim {name}",
+    "heavyknife.chat.position.3": "ich warte beim {name}",
+    "heavyknife.chat.position.4": "eile zu {name}.. ich bin dort",
+    "heavyknife.chat.position.5": "ich warte bei {name}",
+    "heavyknife.chat.position.6": "schickt Hilfe, ich bin bei {name}",
+    "heavyknife.chat.position.7": "ich chille bei {name}",
+    "heavyknife.chat.position.8": "ich habe den Käse bei {name} gefunden",
+    "heavyknife.chat.position.9": "gratis liebe bei {name}, komm zu mir",
+    "heavyknife.chat.position.10": "plot Twist: Ich bin definitiv bei {name}",
+    "heavyknife.chat.position.11": "schickt Verstärkung, ich stecke bei {name} fest",
+    "heavyknife.chat.position.12": "ich habe das geheime Versteck bei {name} gefunden",
+    "heavyknife.chat.position.13": "vollkommen verloren bei {name}, schickt Koordinaten",
+    "heavyknife.chat.position.14": "ich bin bei {name} und warte..."
 }
