@@ -53,6 +53,22 @@ namespace CheaterTroll
             Console.WriteLine(Localizer["core.config"]);
         }
 
+        private CheaterConfig CreateCheaterConfigWithDefaults()
+        {
+            CheaterConfig config = new();
+
+            config.InvisibleEnemies.Enabled = Config.Plugins.InvisibleEnemies.DefaultEnabled;
+            config.RandomPlayerSounds.Enabled = Config.Plugins.RandomPlayerSounds.DefaultEnabled;
+            config.GrenadeSelfDamage.Enabled = Config.Plugins.GrenadeSelfDamage.DefaultEnabled;
+            config.ImpossibleBombPlant.Enabled = Config.Plugins.ImpossibleBombPlant.DefaultEnabled;
+            config.DoorGate.Enabled = Config.Plugins.DoorGate.DefaultEnabled;
+            config.DamageControl.Enabled = Config.Plugins.DamageControl.DefaultEnabled;
+            config.PlayerGlow.Enabled = Config.Plugins.PlayerGlow.DefaultEnabled;
+            config.VisibleOnRadar.Enabled = Config.Plugins.VisibleOnRadar.DefaultEnabled;
+
+            return config;
+        }
+
         private void DeleteCheaterConfig(CCSPlayerController player)
         {
             if (player == null

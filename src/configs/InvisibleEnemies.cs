@@ -5,8 +5,10 @@ namespace CheaterTroll
 {
     public class InvisibleEnemiesConfig
     {
-        // enabled
+        // enable or disable globally (load plug-in or not)
         [JsonPropertyName("enabled")] public bool Enabled { get; set; } = true;
+        // enable or disable for a new cheater by default
+        [JsonPropertyName("enabled_for_new_cheater")] public bool DefaultEnabled { get; set; } = false;
         [JsonIgnore] public InvisibleEnemiesMode DefaultMode { get; set; } = InvisibleEnemiesMode.Full;
         [JsonPropertyName("mode")]
         public string DefaultModeString

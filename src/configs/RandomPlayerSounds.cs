@@ -15,8 +15,10 @@ namespace CheaterTroll
 
     public class RandomPlayerSoundsConfig
     {
-        // enabled
+        // enable or disable globally (load plug-in or not)
         [JsonPropertyName("enabled")] public bool Enabled { get; set; } = true;
+        // enable or disable for a new cheater by default
+        [JsonPropertyName("enabled_for_new_cheater")] public bool DefaultEnabled { get; set; } = false;
         // random sound list with their parameters
         [JsonPropertyName("sounds")]
         public List<RandomPlayerSoundConfig> Sounds { get; set; } = [

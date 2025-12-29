@@ -208,7 +208,7 @@ namespace CheaterTroll
                 }
                 else
                 {
-                    Config.Cheater.Add(steamId, new CheaterConfig());
+                    Config.Cheater.Add(steamId, CreateCheaterConfigWithDefaults());
                     if (state.SelectedPlayer != null)
                     {
                         EnablePlayerCheats(state.SelectedPlayer);
