@@ -17,8 +17,6 @@ namespace CheaterTroll
         // - the player name on connection to avoid fast name-changing hacks and allow the player to be identified properly
         // entries: name, steam_id, timestamp (CurrentTime)
         private readonly Dictionary<CCSPlayerController, Dictionary<PlayerData, string>> _connectedPlayers = [];
-        // current active cheaters on our server
-        private readonly Dictionary<CCSPlayerController, CheaterConfig> _activeCheaters = [];
         private readonly List<PluginBlueprint> _plugins = [];
 
         public override void Load(bool hotReload)
@@ -34,7 +32,6 @@ namespace CheaterTroll
             if (hotReload)
             {
                 UpdatePlayerInfos();
-                LoadCheaterConfigs();
                 EnableAllPlayerCheats();
                 Console.WriteLine(Localizer["core.hotreload"]);
             }
@@ -49,8 +46,6 @@ namespace CheaterTroll
             DeregisterEventHandler<EventPlayerDisconnect>(OnPlayerDisconnect);
             // unload plugins
             DestroyModules();
-            // save configs
-            SaveCheaterConfigs();
             // write config to disk
             Config.Update();
             Console.WriteLine(Localizer["core.unload"]);
@@ -64,9 +59,7 @@ namespace CheaterTroll
 
         private void OnMapEnd()
         {
-            SaveCheaterConfigs();
             DestroyModules();
-            _activeCheaters.Clear();
             _clientConsoleMenu.ClearAllStates();
             Config.Update();
         }
@@ -87,8 +80,6 @@ namespace CheaterTroll
             {
                 return HookResult.Continue;
             }
-            // load cheater config
-            LoadCheaterConfig(player);
             // enable player cheats (if any)
             EnablePlayerCheats(player);
             return HookResult.Continue;
@@ -108,16 +99,12 @@ namespace CheaterTroll
             // remove client console menu state
             _clientConsoleMenu.RemovePlayerState(player);
             // check if player is a cheater
-            if (!_activeCheaters.ContainsKey(player))
+            if (!CheckIfCheater(player))
             {
                 return HookResult.Continue;
             }
-            // save config for player
-            SaveCheaterConfig(player);
             // remove plugins for player
             RemovePluginsForUser(player);
-            // remove player from list
-            _ = _activeCheaters.Remove(player);
             return HookResult.Continue;
         }
 

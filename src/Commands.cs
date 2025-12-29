@@ -137,7 +137,6 @@ namespace CheaterTroll
 
             state.SelectedPlayer = players[choice - 1];
             state.CurrentLevel = MenuLevel.PlayerConfig;
-            LoadCheaterConfig(state.SelectedPlayer);
             ShowPlayerConfigMenu(command, player, state.SelectedPlayer);
         }
 
@@ -151,17 +150,13 @@ namespace CheaterTroll
                 if (isExistingCheater)
                 {
                     _ = Config.Cheater.Remove(steamId);
-                    _ = _activeCheaters.Remove(state.SelectedPlayer);
                     DeleteCheaterConfig(state.SelectedPlayer);
-                    SaveCheaterConfigs();
                     RemovePlayerCheats(state.SelectedPlayer);
                     command.ReplyToCommand("✓ Cheater disabled");
                 }
                 else
                 {
-                    _activeCheaters[state.SelectedPlayer] = new CheaterConfig();
-                    SaveCheaterConfig(state.SelectedPlayer);
-                    SaveCheaterConfigs();
+                    Config.Cheater.Add(steamId, new CheaterConfig());
                     EnablePlayerCheats(state.SelectedPlayer);
                     command.ReplyToCommand("✓ Cheater enabled");
                 }
@@ -196,15 +191,15 @@ namespace CheaterTroll
 
         private void HandleConfigEntryChoice(CommandInfo command, CCSPlayerController? player, PlayerMenuState state, int choice)
         {
+            string steamId = state.SelectedPlayer!.SteamID.ToString();
             object? configObject = typeof(CheaterConfig).GetProperty(state.SelectedConfigProperty!)!
-                .GetValue(_activeCheaters[state.SelectedPlayer!]);
+                .GetValue(Config.Cheater[steamId]);
 
             if (choice == 1)
             {
                 PropertyInfo enabledProperty = configObject!.GetType().GetProperty("Enabled")!;
                 bool isEnabled = (bool)enabledProperty.GetValue(configObject)!;
                 enabledProperty.SetValue(configObject, !isEnabled);
-                SaveCheaterConfig(state.SelectedPlayer!);
                 EnablePlayerCheats(state.SelectedPlayer!);
                 command.ReplyToCommand($"✓ {state.SelectedConfigProperty} {(!isEnabled ? "enabled" : "disabled")}");
                 ShowConfigEntryMenu(command, player, state.SelectedPlayer!, state.SelectedConfigProperty!);
@@ -242,7 +237,6 @@ namespace CheaterTroll
             {
                 bool value = (bool)selectedProp.GetValue(configObject)!;
                 selectedProp.SetValue(configObject, !value);
-                SaveCheaterConfig(state.SelectedPlayer!);
                 EnablePlayerCheats(state.SelectedPlayer!);
                 command.ReplyToCommand($"✓ {selectedProp.Name} {(!value ? "enabled" : "disabled")}");
                 ShowConfigEntryMenu(command, player, state.SelectedPlayer!, state.SelectedConfigProperty!);
@@ -287,9 +281,9 @@ namespace CheaterTroll
                 ShowConfigEntryMenu(command, player, state.SelectedPlayer!, state.SelectedConfigProperty!);
                 return;
             }
-
+            string steamId = state.SelectedPlayer!.SteamID.ToString();
             object? configObject = typeof(CheaterConfig).GetProperty(state.SelectedConfigProperty!)!
-                .GetValue(_activeCheaters[state.SelectedPlayer!]);
+                .GetValue(Config.Cheater[steamId]);
 
             PropertyInfo propertyInfo = configObject!.GetType().GetProperty(state.EditingPropertyName!)!;
 
@@ -341,7 +335,6 @@ namespace CheaterTroll
                     return;
                 }
 
-                SaveCheaterConfig(state.SelectedPlayer!);
                 EnablePlayerCheats(state.SelectedPlayer!);
                 command.ReplyToCommand($"✓ {state.EditingPropertyName} set to: {propertyInfo.GetValue(configObject)}");
                 state.EditingPropertyName = null;
@@ -398,7 +391,7 @@ namespace CheaterTroll
                 int index = 2;
                 foreach (PropertyInfo? feature in features)
                 {
-                    CheaterConfig configObject = _activeCheaters[selectedPlayer];
+                    CheaterConfig configObject = Config.Cheater[steamId];
                     object? featureValue = feature.GetValue(configObject);
                     PropertyInfo? enabledProp = featureValue?.GetType().GetProperty("Enabled");
                     bool isEnabled = enabledProp != null && (bool)enabledProp.GetValue(featureValue)!;
@@ -424,8 +417,9 @@ namespace CheaterTroll
 
         private void ShowConfigEntryMenu(CommandInfo command, CCSPlayerController? player, CCSPlayerController selectedPlayer, string configProperty)
         {
+            string steamId = selectedPlayer.SteamID.ToString();
             object? configObject = typeof(CheaterConfig).GetProperty(configProperty)!
-                .GetValue(_activeCheaters[selectedPlayer]);
+                .GetValue(Config.Cheater[steamId]);
 
             StringBuilder menu = new();
             _ = menu.AppendLine($"=== Overview -> {selectedPlayer.PlayerName} -> {configProperty} ===");
@@ -548,18 +542,22 @@ namespace CheaterTroll
 
         private void EnableAllPlayerCheats()
         {
-            foreach (KeyValuePair<CCSPlayerController, CheaterConfig> kvp in _activeCheaters)
+            foreach (var kvp in _connectedPlayers)
             {
-                EnablePlayerCheats(kvp.Key);
+                if (CheckIfCheater(kvp.Key))
+                {
+                    EnablePlayerCheats(kvp.Key);
+                }
             }
         }
 
         private void EnablePlayerCheats(CCSPlayerController player)
         {
-            if (!_activeCheaters.ContainsKey(player))
+            if (!CheckIfCheater(player))
             {
                 return;
             }
+            string steamid = player.SteamID.ToString();
             // remove all cheats
             RemovePlayerCheats(player);
             // add active cheats
@@ -571,7 +569,7 @@ namespace CheaterTroll
                 {
                     continue;
                 }
-                object? pluginConfig = configProperty.GetValue(_activeCheaters[player]);
+                object? pluginConfig = configProperty.GetValue(Config.Cheater[steamid]);
                 // check if player has given config entry
                 if (pluginConfig == null)
                 {
@@ -581,7 +579,7 @@ namespace CheaterTroll
                 PropertyInfo? enabledProperty = pluginConfig.GetType().GetProperty("Enabled");
                 if (enabledProperty != null && (bool)enabledProperty.GetValue(pluginConfig)!)
                 {
-                    plugin.Add(player, _activeCheaters[player]);
+                    plugin.Add(player, Config.Cheater[steamid]);
                 }
             }
         }

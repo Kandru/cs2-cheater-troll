@@ -50,52 +50,6 @@ namespace CheaterTroll
             Console.WriteLine(Localizer["core.config"]);
         }
 
-        private void LoadCheaterConfigs()
-        {
-            // load all cheater configs
-            foreach (CCSPlayerController entry in Utilities.GetPlayers().Where(static p => !p.IsBot && !p.IsHLTV))
-            {
-                LoadCheaterConfig(entry);
-            }
-        }
-
-        private void LoadCheaterConfig(CCSPlayerController player)
-        {
-            if (player == null
-                || !player.IsValid)
-            {
-                return;
-            }
-            string steamid = player.SteamID.ToString();
-            _activeCheaters[player] = Config.Cheater.ContainsKey(steamid)
-                ? Config.Cheater[steamid]
-                : new CheaterConfig();
-            _activeCheaters[player].Name = player.PlayerName;
-        }
-
-        private void SaveCheaterConfigs()
-        {
-            foreach (KeyValuePair<CCSPlayerController, CheaterConfig> kvp in _activeCheaters)
-            {
-                SaveCheaterConfig(kvp.Key);
-            }
-        }
-
-        private void SaveCheaterConfig(CCSPlayerController player)
-        {
-            if (player == null
-                || !player.IsValid)
-            {
-
-                return;
-            }
-            // save cheater config to the config file
-            if (_activeCheaters.TryGetValue(player, out CheaterConfig? config))
-            {
-                Config.Cheater[player.SteamID.ToString()] = config;
-            }
-        }
-
         private void DeleteCheaterConfig(CCSPlayerController player)
         {
             if (player == null
@@ -105,6 +59,16 @@ namespace CheaterTroll
             }
             // remove cheater from config
             _ = Config.Cheater.Remove(player.SteamID.ToString());
+        }
+
+        private bool CheckIfCheater(CCSPlayerController player)
+        {
+            string steamId = player.SteamID.ToString();
+            if (Config.Cheater.ContainsKey(steamId))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
