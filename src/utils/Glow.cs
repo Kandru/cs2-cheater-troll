@@ -31,7 +31,7 @@ namespace CheaterTroll.Utils
             _glow.Spawnflags = 256u;
             _glow.Render = Color.FromArgb(255, 255, 255, 255);
             _glow.Glow.GlowColorOverride = color;
-            _glow.RenderMode = RenderMode_t.kRenderGlow;
+            _glow.RenderMode = RenderMode_t.kRenderNormal;
             _glow.Glow.GlowRange = 5000;
             _glow.Glow.GlowTeam = -1;
             _glow.Glow.GlowType = 3;
